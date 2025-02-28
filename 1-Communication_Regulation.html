@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Regulations Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            width: 90%;
+            vertical-align: top;
+        }
+        
+        input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .answer-explanation {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .user-answer-correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .user-answer-incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .option label {
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CERC Communication System Regulations Quiz</h1>
+    
+    <div id="intro" class="quiz-container">
+        <h2>Welcome to the Quiz</h2>
+        <p>This quiz will test your knowledge about the Central Electricity Regulatory Commission (Communication System for inter-State transmission of electricity) Regulations, 2017.</p>
+        <p>The quiz contains 30 multiple-choice questions. Select one answer for each question. After completing all questions, you will see your score and the correct answers with explanations.</p>
+        <div class="button-container">
+            <button id="start-btn">Start Quiz</button>
+        </div>
+    </div>
+    
+    <div id="quiz-section" class="hidden">
+        <div id="timer">Time: 00:00</div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="quiz-container" id="question-container">
+            <!-- Questions will be added here dynamically -->
+        </div>
+        
+        <div class="button-container">
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div class="quiz-container">
+            <h2>Quiz Results</h2>
+            <div id="score-display" class="score-display"></div>
+            <div id="time-taken"></div>
+            <div id="answers-container">
+                <!-- Answer explanations will be added here dynamically -->
+            </div>
+            <div class="button-container">
+                <button id="retake-btn">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const quizData = [
+            {
+                question: "What is the full name of the regulations described in the document?",
+                options: [
+                    "Central Electricity Regulatory Commission (Communication System for power sector) Regulations, 2017",
+                    "Central Electricity Regulatory Commission (Communication System for inter-State transmission of electricity) Regulations, 2017",
+                    "Central Electricity Regulatory Commission (Communication infrastructure for grid operations) Regulations, 2017",
+                    "Central Electricity Regulatory Commission (Data Communication for inter-State transmission) Regulations, 2017"
+                ],
+                correctAnswer: 1,
+                explanation: "As stated in Section 1(i), the full name is \"Central Electricity Regulatory Commission (Communication System for inter-State transmission of electricity) Regulations, 2017.\""
+            },
+            {
+                question: "When did these regulations come into force?",
+                options: [
+                    "15th May 2017",
+                    "1st July 2017",
+                    "1st January 2017",
+                    "30th June 2017"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 1(ii), \"These regulations shall come into force w.e.f. 1.7.2017.\""
+            },
+            {
+                question: "Who is the nodal agency for planning and coordination for development of communication system for inter-State transmission system?",
+                options: [
+                    "Central Electricity Authority (CEA)",
+                    "Regional Load Despatch Centre (RLDC)",
+                    "Central Transmission Utility (CTU)",
+                    "National Load Despatch Centre (NLDC)"
+                ],
+                correctAnswer: 2,
+                explanation: "As per Section 6(i), \"The nodal agency for planning, and coordination for development of communication system for inter-State transmission system user shall be the Central Transmission Utility.\""
+            },
+            {
+                question: "What does \"Communication Channel\" mean according to the regulations?",
+                options: [
+                    "A physical medium for transmitting electricity",
+                    "A dedicated virtual path configured from one user's node to another user's node",
+                    "A communication protocol for data exchange",
+                    "A hardware device used for communication"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 2(i)(f), \"Communication Channel\" means a dedicated virtual path configured from one users' node to another user's node, either directly or through intermediary node(s) to facilitate voice, video and data communication and tele-protection system."
+            },
+            {
+                question: "What is the specified annual availability requirement for communication channels maintained by all users?",
+                options: [
+                    "95%",
+                    "98%",
+                    "99.9%",
+                    "100%"
+                ],
+                correctAnswer: 2,
+                explanation: "As per Section 12, \"All users of CTU, NLDC, RLDCs, SLDCs, STUs shall maintain the communication channel availability at 99.9% annually.\""
+            },
+            {
+                question: "What availability should be maintained with a backup communication system?",
+                options: [
+                    "99%",
+                    "99.9%",
+                    "99.99%",
+                    "100%"
+                ],
+                correctAnswer: 3,
+                explanation: "According to Section 12, \"...with back up communication system, the availability of communication system should be 100%.\""
+            },
+            {
+                question: "Who is responsible for issuance of guidelines on \"Availability of Communication System\"?",
+                options: [
+                    "Central Transmission Utility (CTU)",
+                    "National Power Committee (NPC)",
+                    "Regional Power Committee (RPC)",
+                    "National Load Despatch Centre (NLDC)"
+                ],
+                correctAnswer: 1,
+                explanation: "As per Section 7.3(i), \"NPC shall be responsible for issuance of the guidelines with the approval of the Commission on 'Availability of Communication System' in consultation with RPCs, RLDCs, CTU, CEA and other stakeholders.\""
+            },
+            {
+                question: "Who certifies the availability of communication equipment for CTU, ISGS, RLDCs, NLDC, and SLDCs?",
+                options: [
+                    "CEA",
+                    "CTU",
+                    "NLDC",
+                    "RPC Secretariat"
+                ],
+                correctAnswer: 3,
+                explanation: "According to Section 7.3(ii), \"The RPC Secretariat shall certify the availability of communication equipment for CTU, ISGS, RLDCs, NLDC, SLDCs based on the data furnished by RLDC.\""
+            },
+            {
+                question: "Who is responsible for outage planning of the communication system in a region?",
+                options: [
+                    "NLDC",
+                    "RLDC",
+                    "RPC Secretariat",
+                    "CTU"
+                ],
+                correctAnswer: 2,
+                explanation: "As per Section 7.3(iv), \"The RPC Secretariat shall be responsible for outage planning for communication system in its region.\""
+            },
+            {
+                question: "Which entity is responsible for integration and supervision of Communication System of the ISTS, ISGS, SLDCs, and IPPs?",
+                options: [
+                    "NLDC",
+                    "RLDC",
+                    "RPC",
+                    "CTU"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 7.5(i), \"The Regional Load Despatch Centre shall be nodal agency for integration and supervision of Communication System of the ISTS, ISGS, SLDCs and IPPs at RLDC end.\""
+            },
+            {
+                question: "What is the role of NLDC regarding interfacing requirements?",
+                options: [
+                    "To implement the interfacing requirements",
+                    "To audit the interfacing requirements",
+                    "To prepare and issue guidelines on interfacing requirements",
+                    "To test the interfacing requirements"
+                ],
+                correctAnswer: 2,
+                explanation: "As per Section 7.4(i), \"The National Load Despatch Centre (NLDC) shall be responsible for preparation and issuance guidelines with the approval of the Commission on the 'Interfacing Requirements'.\""
+            },
+            {
+                question: "Who is the nodal agency for planning and coordination for communication system development for intra-State transmission?",
+                options: [
+                    "State Load Despatch Centre (SLDC)",
+                    "Regional Load Despatch Centre (RLDC)",
+                    "State Transmission Utility (STU)",
+                    "Central Transmission Utility (CTU)"
+                ],
+                correctAnswer: 2,
+                explanation: "According to Section 6(ii), \"The nodal agency for planning, and coordination for development of communication system for intra-State transmission system user shall be the State Transmission Utility.\""
+            },
+            {
+                question: "Who is responsible for monitoring cases of cyber security incidents?",
+                options: [
+                    "CTU",
+                    "NLDC",
+                    "RPC",
+                    "CEA"
+                ],
+                correctAnswer: 1,
+                explanation: "As per Section 13(ii), \"NLDC shall monitor case of cyber security incidences and discuss them at RPC level and take necessary action as deemed fit.\""
+            },
+            {
+                question: "How frequently must the RPC Secretariat conduct performance audits of the communication system?",
+                options: [
+                    "Monthly",
+                    "Quarterly",
+                    "Semi-annually",
+                    "Annually"
+                ],
+                correctAnswer: 3,
+                explanation: "According to Section 10, \"The RPC Secretariat shall conduct performance audit of communication system annually.\""
+            },
+            {
+                question: "Who prepares the procedure for \"Maintenance and testing of communication system\"?",
+                options: [
+                    "NLDC",
+                    "CTU",
+                    "CEA",
+                    "RPC"
+                ],
+                correctAnswer: 1,
+                explanation: "As per Section 14.1(ii), \"CTU shall prepare Procedure on 'Maintenance and testing of communication system' in terms of Regulation 9 of these Regulations.\""
+            },
+            {
+                question: "Which organization formulates communication planning criterion and guidelines for development of reliable communication system?",
+                options: [
+                    "Central Electricity Authority (CEA)",
+                    "Central Transmission Utility (CTU)",
+                    "Regional Power Committee (RPC)",
+                    "National Load Despatch Centre (NLDC)"
+                ],
+                correctAnswer: 0,
+                explanation: "According to Section 7.1(i), \"CEA shall formulate communication planning criterion and guidelines for development of reliable communication system for power system of India.\""
+            },
+            {
+                question: "Who is responsible for preparing the procedure on \"Centralized supervision for quick fault detection and restoration\"?",
+                options: [
+                    "NLDC",
+                    "RLDC",
+                    "CTU",
+                    "CEA"
+                ],
+                correctAnswer: 2,
+                explanation: "As per Section 14.1(ii), \"CTU shall prepare Procedure on 'Centralized supervision for quick fault detection and restoration' in terms of Regulation 7.2.\""
+            },
+            {
+                question: "Which committee is constituted by CEA for preparing perspective plan for communication?",
+                options: [
+                    "National Power Committee",
+                    "Standing Committee for Communication System in Power Sector",
+                    "Regional Power Committee",
+                    "Cyber Security Committee"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 7.1(iii), \"CEA shall constitute and notify a Standing Committee for Communication System in Power Sector.\""
+            },
+            {
+                question: "What is required of users regarding the provision of equipment for communication?",
+                options: [
+                    "They must purchase equipment from approved vendors only",
+                    "They must provide compatible equipment for uninterrupted communication",
+                    "They must use only fiber optic communication systems",
+                    "They must replace all equipment every five years"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 7.8(i), \"The Users including renewable energy generators shall be responsible for provision of compatible equipment along with appropriate interface for un-interrupted communication with the concerned control centres.\""
+            },
+            {
+                question: "Who conducts third-party cyber security audits as per the regulations?",
+                options: [
+                    "CERT-In certified third-party auditors",
+                    "CTU appointed auditors",
+                    "CEA certified auditors",
+                    "NLDC empaneled auditors"
+                ],
+                correctAnswer: 0,
+                explanation: "As per Section 13(iii), \"The audits shall be conducted by CERT-In certified third party auditors.\""
+            },
+            {
+                question: "What is the time frame within which CTU must prepare the procedure for centralized supervision after notification of the regulations?",
+                options: [
+                    "30 days",
+                    "45 days",
+                    "60 days",
+                    "90 days"
+                ],
+                correctAnswer: 2,
+                explanation: "According to Section 7.2(vii), \"CTU shall prepare Procedure for same and submit to Commission for approval within 60 days of notification of these Regulations.\""
+            },
+            {
+                question: "What does RTU stand for as defined in the regulations?",
+                options: [
+                    "Real-Time Unit",
+                    "Remote Terminal Units",
+                    "Regional Transmission Unit",
+                    "Reliable Telemetry Unit"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 2(i)(u), \"Remote Terminal Units\" (RTU) means a device suitable for measuring, recording and storing the consumption of electricity or any other quantity related with electrical system.\""
+            },
+            {
+                question: "What are the boundaries of ISTS Communication system as per the regulations?",
+                options: [
+                    "Only NLDC and RLDCs",
+                    "NLDC, RLDCs, and SLDCs only",
+                    "NLDC, RLDCs, SLDCs, ISTS sub-stations, and ISGS",
+                    "Only power plants and substations"
+                ],
+                correctAnswer: 2,
+                explanation: "Section 8.1 lists the boundaries of ISTS Communication system as NLDC, RLDCs, SLDCs (ISTS interconnection), ISTS sub-stations, and various generating stations connected to ISTS."
+            },
+            {
+                question: "What must be done in case of a communication system fault that requires prolonged restoration time?",
+                options: [
+                    "The service must be discontinued permanently",
+                    "The communication provider shall explore route diversion on existing facility",
+                    "A penalty must be paid by the faulty system owner",
+                    "The system must be upgraded completely"
+                ],
+                correctAnswer: 1,
+                explanation: "As per Section 11(ii), \"The communication provider shall explore the possibility for route diversion on the existing facility in close co-ordination with concerned provider in case the fault restoration is prolonged.\""
+            },
+            {
+                question: "When must an Annual Report on the audit carried out by respective RPCs be submitted to the Commission?",
+                options: [
+                    "Within one week of closing of the financial year",
+                    "Within two weeks of closing of the financial year",
+                    "Within one month of closing of the financial year",
+                    "Within two months of closing of the financial year"
+                ],
+                correctAnswer: 2,
+                explanation: "According to Section 10, \"An Annual Report on the audit carried out by respective RPCs shall be submitted to the Commission within one month of closing of the financial year.\""
+            },
+            {
+                question: "What should the communication infrastructure planning address as per the regulations?",
+                options: [
+                    "Only cost considerations",
+                    "Only reliability factors",
+                    "Network security needs per CEA standards and Govt. of India Cyber Security Policy",
+                    "Only geographical challenges"
+                ],
+                correctAnswer: 2,
+                explanation: "Section 13(i) states that \"Communication infrastructure shall be planned, designed and executed to address the network security needs as per standard specified by CEA and shall be in conformity with the Cyber Security Policy of the Govt. of India.\""
+            },
+            {
+                question: "What is included in the definition of \"data\" as per the regulations?",
+                options: [
+                    "Only digital values",
+                    "Only analog signals",
+                    "Only text information",
+                    "A set of values of analogue or digital signals including text, voice, video, etc."
+                ],
+                correctAnswer: 3,
+                explanation: "According to Section 2(i)(j), \"data\" means a set of values of analogue or digital signal including a text, voice, video, tele-protection, alarm, control signal, phasor, weather parameter, parameter of a machine or the power system."
+            },
+            {
+                question: "What is PMU as defined in the regulations?",
+                options: [
+                    "Power Management Unit",
+                    "Phasor Measurement Unit",
+                    "Primary Metering Unit",
+                    "Power Monitoring Utility"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 2(i)(q), \"PMU (Phasor Measurement Unit)\" means a device which provides phasor information (both magnitude and phase angle) for one or more phases of AC voltage or current waveforms in real time."
+            },
+            {
+                question: "In the framework of these regulations, who is the nodal agency for ensuring integration of communication system at regional level with SCADA, WAMS, etc. for ISGS, ISTS and SLDCs?",
+                options: [
+                    "CEA",
+                    "CTU",
+                    "Respective RLDC",
+                    "NLDC"
+                ],
+                correctAnswer: 2,
+                explanation: "As per Section 6(iii), \"The nodal agency for ensuring integration of communication system at regional level with SCADA, WAMS, Video Conferencing Systems(VCS), Automatic Meter Reading(AMR), EPABX, Tele-protection system shall be respective RLDC for ISGS, ISTS and SLDCs.\""
+            },
+            {
+                question: "How are disputes resolved under these regulations?",
+                options: [
+                    "Through arbitration",
+                    "By approaching the Commission with a proper application",
+                    "Through mediation by CEA",
+                    "Through a committee formed by CTU"
+                ],
+                correctAnswer: 1,
+                explanation: "According to Section 15, \"In case of any dispute in giving effect to these regulations, the affected party may approach the Commission with a proper application in accordance with Central Electricity Regulatory Commission (Conduct of Business) Regulations, 1999 as amended from time to time.\""
+            }
+        ];
+        
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const quizSection = document.getElementById('quiz-section');
+        const questionContainer = document.getElementById('question-container');
+        const resultsSection = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const timeTakenElement = document.getElementById('time-taken');
+        
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        
+        // Variables
+        let userAnswers = [];
+        let timer;
+        let seconds = 0;
+        
+        // Event listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuiz);
+        retakeBtn.addEventListener('click', retakeQuiz);
+        
+        // Functions
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+        
+        function renderQuestions() {
+            questionContainer.innerHTML = '';
+            
+            quizData.forEach((questionData, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${questionData.question}</div>
+                    <div class="options">
+                        ${questionData.options.map((option, optionIndex) => `
+                            <div class="option">
+                                <input type="radio" id="q${index}-option${optionIndex}" name="question${index}" value="${optionIndex}">
+                                <label for="q${index}-option${optionIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionContainer.appendChild(questionDiv);
+            });
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', updateProgressBar);
+            });
+        }
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerElement.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateProgressBar() {
+            const totalQuestions = quizData.length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function submitQuiz() {
+            clearInterval(timer);
+            
+            // Collect user answers
+            userAnswers = [];
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                userAnswers.push(selectedOption ? parseInt(selectedOption.value) : -1);
+            }
+            
+            // Check if all questions are answered
+            const unansweredQuestions = userAnswers.filter(answer => answer === -1).length;
+            if (unansweredQuestions > 0) {
+                if (confirm(`You have ${unansweredQuestions} unanswered question(s). Are you sure you want to submit?`)) {
+                    showResults();
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display score
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreDisplay.innerHTML = `Your Score: ${score} out of ${quizData.length} (${percentage}%)`;
+            
+            // Display time taken
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timeTakenElement.textContent = `Time taken: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // Display answers and explanations
+            answersContainer.innerHTML = '';
+            quizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.correctAnswer;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.classList.add('answer-explanation');
+                
+                answerDiv.innerHTML = `
+                    <div><strong>Question ${index + 1}:</strong> ${questionData.question}</div>
+                    <div class="correct-answer">Correct Answer: ${String.fromCharCode(65 + questionData.correctAnswer)}. ${questionData.options[questionData.correctAnswer]}</div>
+                    <div class="${isCorrect ? 'user-answer-correct' : 'user-answer-incorrect'}">
+                        Your Answer: ${userAnswer === -1 ? 'Not answered' : String.fromCharCode(65 + userAnswer) + '. ' + questionData.options[userAnswer]}
+                    </div>
+                    <div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            // Hide quiz section and show results
+            quizSection.classList.add('hidden');
+            resultsSection.style.display = 'block';
+        }
+        
+        function retakeQuiz() {
+            // Reset variables
+            userAnswers = [];
+            seconds = 0;
+            
+            // Hide results and show quiz
+            resultsSection.style.display = 'none';
+            quizSection.classList.remove('hidden');
+            
+            // Re-render questions
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+    </script>
+</body>
+</html>
