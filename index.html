@@ -18,7 +18,7 @@
 
     <script>
         async function loadQuizzes() {
-            const response = await fetch('https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/PalashjyotiBorah/Basic_PSO_2025_Prep/main/quizzes.json')
+            const response = await fetch('data/quizzes.json')
             const quizzes = await response.json();
             const select = document.getElementById("quizList");
 
