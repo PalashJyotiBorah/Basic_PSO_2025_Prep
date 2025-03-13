@@ -5,35 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select a Quiz</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        select, button { padding: 10px; font-size: 16px; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <h1>Select a Quiz</h1>
-    <select id="quizList">
-        <option value="">-- Select a Quiz --</option>
-    </select>
-    <button onclick="startQuiz()">Start Quiz</button>
+    <div class="container">
+        <h1>Select a Quiz</h1>
+        <select id="quizList">
+            <option value="">-- Select a Quiz --</option>
+        </select>
+        <button onclick="startQuiz()">Start Quiz</button>
+    </div>
 
     <script>
         async function loadQuizzes() {
-            const response = await fetch('data/quizzes.json')
-            const quizzes = await response.json();
-            const select = document.getElementById("quizList");
-
-            quizzes.forEach(quiz => {
-                let option = document.createElement("option");
-                option.value = quiz.file;
-                option.textContent = quiz.name;
-                select.appendChild(option);
-            });
+            try {
+                const response = await fetch('data/quizzes.json');
+                const quizzes = await response.json();
+                const select = document.getElementById("quizList");
+                
+                quizzes.forEach(quiz => {
+                    let option = document.createElement("option");
+                    option.value = quiz.file;
+                    option.textContent = quiz.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading quizzes:", error);
+            }
         }
 
         function startQuiz() {
             const selectedQuiz = document.getElementById("quizList").value;
             if (selectedQuiz) {
-                window.location.href = selectedQuiz; // Redirect to quiz page
+                window.location.href = selectedQuiz;
             } else {
                 alert("Please select a quiz!");
             }
