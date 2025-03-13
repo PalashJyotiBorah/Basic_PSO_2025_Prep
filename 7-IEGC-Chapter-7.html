@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEGC Chapter 7 Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            width: 90%;
+            vertical-align: top;
+        }
+        
+        input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .answer-explanation {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .user-answer-correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .user-answer-incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .option label {
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>IEGC Chapter 7 Quiz</h1>
+    
+    <div id="intro" class="quiz-container">
+        <h2>Welcome to the Chapter 7 IEGC 2023 (Scheduling and Despatch Code) Quiz</h2>
+        <p>Select one answer for each question. After completing all questions, you will see your score and the correct answers with explanations.</p>
+        <div class="button-container">
+            <button id="start-btn">Start Quiz</button>
+        </div>
+    </div>
+    
+    <div id="quiz-section" class="hidden">
+        <div id="timer">Time: 00:00</div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="quiz-container" id="question-container">
+            <!-- Questions will be added here dynamically -->
+        </div>
+        
+        <div class="button-container">
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div class="quiz-container">
+            <h2>Quiz Results</h2>
+            <div id="score-display" class="score-display"></div>
+            <div id="time-taken"></div>
+            <div id="answers-container">
+                <!-- Answer explanations will be added here dynamically -->
+            </div>
+            <div class="button-container">
+                <button id="retake-btn">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const quizData = [
+        {
+            "question": "Which entity is responsible for optimum scheduling and dispatch of electricity within a state?",
+            "options": [
+                "Regional Load Despatch Centre (RLDC)",
+                "State Load Despatch Centre (SLDC)",
+                "National Load Despatch Centre (NLDC)",
+                "Central Transmission Utility (CTU)"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 43(3), the SLDCs shall be responsible for optimum scheduling and dispatch of electricity within its State control area."
+        },
+        {
+            "question": "What percentage of connectivity to ISTS requires an entity to be under RLDC jurisdiction?",
+            "options": [
+                "Less than 50%",
+                "More than 50%",
+                "Exactly 50%",
+                "More than or equal to 50%"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to regulation 43(6), an entity connected to both ISTS and intra-State transmission systems shall be under RLDC jurisdiction if more than or equal to 50% of the quantum of connectivity is with ISTS."
+        },
+        {
+            "question": "Who is responsible for forecasting demand on a regional basis?",
+            "options": [
+                "State Load Despatch Centre (SLDC)",
+                "Regional Load Despatch Centre (RLDC)",
+                "National Load Despatch Centre (NLDC)",
+                "Generating stations"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 44(1)(a), RLDC is responsible for forecasting demand based on inputs from SLDCs and regional entities."
+        },
+        {
+            "question": "What does the Security Constrained Economic Dispatch (SCED) aim to optimize?",
+            "options": [
+                "Demand forecasting",
+                "Power purchase agreements",
+                "Generation dispatch",
+                "Grid frequency maintenance"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 45(2)(c)(iv), SCED is used to optimize generation dispatch while considering security constraints."
+        },
+        {
+            "question": "How frequently must RLDCs update the list of regional entity generating stations?",
+            "options": [
+                "Annually",
+                "Semi-annually",
+                "Quarterly",
+                "Monthly"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 45(1)(a), RLDCs must publish and update the list of all regional entity generating stations quarterly."
+        },
+        {
+            "question": "Which entity coordinates the scheduling and dispatch of inter-regional power exchange?",
+            "options": [
+                "SLDC",
+                "CTU",
+                "RLDC",
+                "NLDC"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to regulation 44(2)(a), NLDC is responsible for optimum scheduling and dispatch of electricity over inter-regional links among RLDCs."
+        },
+        {
+            "question": "Under which condition can a hydro generating station declare an overload capability of more than 10%?",
+            "options": [
+                "During drought conditions",
+                "During high inflow periods with CEA approval",
+                "Only during peak demand hours",
+                "Never"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 45(10)(a), hydro generating stations may declare an overload capability of more than 10% during high inflow periods if approved by CEA."
+        },
+        {
+            "question": "Which entity is responsible for publishing TTC and ATC assessments for inter-State transmission?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "CTU"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 44(1)(e), RLDC is responsible for assessing TTC and ATC for inter-State transmission and submitting it to NLDC."
+        },
+        {
+            "question": "What is the minimum ramping rate for hydro power plants?",
+            "options": [
+                "1% per minute",
+                "3% per minute",
+                "5% per minute",
+                "10% per minute"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to regulation 45(9)(a)(iii), hydro power plants must declare a ramping rate of at least 10% per minute."
+        },
+        {
+            "question": "Which entity is responsible for finalizing SCED and SCUC and publishing them on its website?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "CEA"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 44(2)(f), NLDC is responsible for finalizing SCED and SCUC and publishing them on its website."
+        },
+        {
+            "question": "What is the primary purpose of the Security Constrained Unit Commitment (SCUC) process?",
+            "options": [
+                "To minimize power consumption",
+                "To maximize reserve availability for grid security",
+                "To reduce transmission losses",
+                "To allocate power to rural areas"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 46(1), the primary objective of SCUC is to commit a generating station or unit to maximize reserves in the interest of grid security."
+        },
+        {
+            "question": "What is the minimum turndown level for a regional entity thermal generating station?",
+            "options": [
+                "40% of MCR",
+                "55% of MCR",
+                "60% of MCR",
+                "70% of MCR"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 45(12), the minimum turndown level for a regional entity thermal generating station shall be 55% of the MCR of the said unit."
+        },
+        {
+            "question": "Which of the following factors is NOT a reason for the NLDC to undertake SCUC?",
+            "options": [
+                "Extreme variation in weather conditions",
+                "High load forecast",
+                "Transmission network congestion",
+                "Increase in renewable energy generation"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to regulation 46(4)(d), SCUC is undertaken in cases of anticipated shortfall of reserves due to extreme weather, high load forecast, and network congestion, but not explicitly for increased renewable energy generation."
+        },
+        {
+            "question": "What is the primary purpose of the Area Control Error (ACE) in grid operations?",
+            "options": [
+                "To measure the difference between scheduled and actual generation",
+                "To balance demand and supply in real-time",
+                "To optimize the utilization of renewable energy sources",
+                "To track transmission losses in the system"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 45(7), the ACE is used to ensure real-time balancing of demand and supply to minimize discrepancies between scheduled and actual generation."
+        },
+        {
+            "question": "What happens if a regional entity generating station fails to demonstrate its declared capacity?",
+            "options": [
+                "It faces no penalties",
+                "It must re-declare the capacity next day",
+                "It is considered a mis-declaration and faces financial penalties",
+                "It must operate below declared capacity for the next cycle"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 45(8)(c), if a generating station fails to demonstrate the declared capacity, it is treated as a mis-declaration and financial penalties are levied."
+        },
+        {
+            "question": "Who is responsible for submitting the day-ahead forecast for wind and solar generation?",
+            "options": [
+                "RLDC",
+                "SLDC",
+                "Wind and Solar (WS) Seller",
+                "NLDC"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 45(8)(b), the WS seller must declare the available capacity on a day-ahead basis."
+        },
+        {
+            "question": "Which entity is responsible for managing the Settlement Nodal Agency?",
+            "options": [
+                "NLDC",
+                "RLDC",
+                "CTU",
+                "Ministry of Power"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 44(6), the Settlement Nodal Agency coordinates with RLDC and NLDC for scheduling, dispatch, and settlement."
+        },
+        {
+            "question": "What is the main role of the Security Constrained Economic Dispatch (SCED)?",
+            "options": [
+                "To allocate power optimally based on security constraints",
+                "To facilitate open access transactions",
+                "To balance renewable energy fluctuations",
+                "To provide a backup power reserve"
+            ],
+            "correctAnswer": 0,
+            "explanation": "According to regulation 45(2)(c)(iv), SCED optimizes scheduling by considering economic dispatch and security constraints."
+        },
+        {
+            "question": "Which entity is responsible for finalizing TTC and ATC and publishing them on its website?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "CTU"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 44(2)(e), NLDC is responsible for finalizing TTC and ATC and publishing them on its website."
+        },
+        {
+            "question": "Which of the following actions is NOT a responsibility of RLDC?",
+            "options": [
+                "Monitoring real-time grid operations",
+                "Coordinating the accounting of regional pool accounts",
+                "Allocating generation quotas for state entities",
+                "Supervising inter-state transmission systems"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 43(2), RLDC is responsible for monitoring real-time grid operations, supervising inter-state transmission systems, and accounting for regional pool accounts, but not for allocating generation quotas."
+        },
+        {
+            "question": "What is the minimum ramping rate required for coal or lignite-fired plants?",
+            "options": [
+                "0.5% per minute",
+                "1% per minute",
+                "2% per minute",
+                "3% per minute"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 45(9)(a)(i), coal or lignite-fired plants must declare a ramp-up or ramp-down rate of at least 1% per minute."
+        },
+        {
+            "question": "What is the purpose of maintaining reserves in grid operations?",
+            "options": [
+                "To ensure grid stability and security",
+                "To increase electricity prices during peak hours",
+                "To support private power generators",
+                "To reduce the dependency on renewable energy"
+            ],
+            "correctAnswer": 0,
+            "explanation": "According to regulation 44(1)(d)(ii), reserves are maintained to ensure grid security and balance demand and supply fluctuations."
+        },
+        {
+            "question": "Which entity is responsible for coordinating the set-points of HVDC interconnections?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "CTU"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 44(2)(d), NLDC coordinates the set-points of all HVDC interconnections."
+        },
+        {
+            "question": "Under which regulation can the Commission approve changes in control area jurisdiction?",
+            "options": [
+                "Regulation 43(5)",
+                "Regulation 43(6)",
+                "Regulation 43(10)",
+                "Regulation 44(1)"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 43(10), the Commission may, on its own motion or on application, grant approval for a change in control area jurisdiction."
+        },
+        {
+            "question": "Who determines the priority of power transactions in case of transmission congestion?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "Power Exchanges"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 45(3), RLDC determines power transaction priorities in case of transmission congestion."
+        },
+        {
+            "question": "Which condition allows a generating station to procure power from an alternate source?",
+            "options": [
+                "If it wants to increase revenue",
+                "If it has planned maintenance",
+                "If a unit undergoes forced outage",
+                "If electricity prices are favorable"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 48(1), a generating station may procure power from an alternate source if a unit undergoes forced outage."
+        },
+        {
+            "question": "What is the purpose of Security Constrained Unit Commitment (SCUC)?",
+            "options": [
+                "To balance load shedding",
+                "To allocate financial subsidies",
+                "To ensure maximum reserves for grid security",
+                "To enforce compliance among state utilities"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 46(1), SCUC is undertaken to commit generating units to maximize reserves for grid security."
+        },
+        {
+            "question": "What must entities do if they exceed their scheduled power drawal?",
+            "options": [
+                "Reduce their consumption immediately",
+                "Purchase additional power in the real-time market",
+                "Pay deviation settlement charges",
+                "Request a schedule revision from NLDC"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 45(6), entities exceeding scheduled drawal must pay deviation settlement charges under the DSM regulations."
+        },
+        {
+            "question": "Which entity is responsible for declaring the Total Transfer Capability (TTC) and Available Transfer Capability (ATC) for inter-State transmission?",
+            "options": [
+                "CTU",
+                "RLDC",
+                "NLDC",
+                "SLDC"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 44(1)(e), RLDC assesses TTC and ATC, while NLDC finalizes and publishes them."
+        },
+        {
+            "question": "Which of the following is NOT a function of the State Load Despatch Centre (SLDC)?",
+            "options": [
+                "Scheduling and dispatch for intra-state entities",
+                "Balancing demand and supply at the national level",
+                "Maintaining and dispatching reserves",
+                "Declaring ATC and TTC for state control areas"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 44(3), SLDC is responsible for intra-state scheduling, dispatching reserves, and declaring TTC and ATC, but balancing at the national level is NLDC's function."
+        },
+        {
+            "question": "What is the primary purpose of a Quick Response Aggregator (QCA) in scheduling renewable energy generation?",
+            "options": [
+                "To control grid frequency fluctuations",
+                "To coordinate and facilitate scheduling on behalf of generators",
+                "To act as a buyer of excess renewable power",
+                "To manage storage of excess renewable energy"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 45(11), a QCA is appointed to coordinate and facilitate scheduling of power from renewable energy generators."
+        },
+        {
+            "question": "Which entity is responsible for resolving discrepancies in scheduling and dispatch records?",
+            "options": [
+                "CTU",
+                "SLDC",
+                "RLDC",
+                "NLDC"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 49(11)(b), RLDC is responsible for rectifying any errors or omissions in scheduling and dispatch records."
+        },
+        {
+            "question": "Which of the following is a key component of Security Constrained Economic Dispatch (SCED)?",
+            "options": [
+                "Maximizing generation from hydro sources",
+                "Allocating power optimally based on cost and security considerations",
+                "Minimizing coal consumption in power plants",
+                "Reducing dependency on inter-state power transmission"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 49(2)(a), SCED optimizes generation dispatch based on economic and security constraints."
+        },
+        {
+            "question": "Under what condition may NLDC undertake SCUC three days in advance?",
+            "options": [
+                "If a cyclone warning is issued",
+                "If reserves are expected to be inadequate on D-1 or D-day",
+                "If a major transmission line is under maintenance",
+                "If power prices fall below a certain threshold"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 46(5)(a), SCUC may be undertaken three days in advance if reserves are anticipated to be inadequate."
+        },
+        {
+            "question": "Which of the following is a consequence of mis-declaration of generation capacity?",
+            "options": [
+                "A financial penalty on the generating station",
+                "Automatic derating of the plant",
+                "Reduction in future power allocation",
+                "Temporary suspension from grid operations"
+            ],
+            "correctAnswer": 0,
+            "explanation": "According to regulation 45(8)(c), a generating station that fails to demonstrate its declared capacity is considered to have made a mis-declaration and is penalized financially."
+        },
+        {
+            "question": "What happens if a regional entity fails to adhere to its net injection or drawal schedule?",
+            "options": [
+                "It is penalized under Deviation Settlement Mechanism (DSM)",
+                "It must submit a revised schedule immediately",
+                "It is barred from future transactions for one month",
+                "It must purchase additional power from an alternate source"
+            ],
+            "correctAnswer": 0,
+            "explanation": "According to regulation 45(6), each regional entity must regulate its generation or demand to adhere to the schedule, or else it is penalized under DSM."
+        },
+        {
+            "question": "Which entity is responsible for coordinating power exchanges in case of transmission congestion?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "CTU"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 44(2)(g), NLDC is responsible for allocating available transmission corridors among power exchanges in case of congestion."
+        },
+        {
+            "question": "What is the purpose of declaring a high inflow period for hydro generating stations?",
+            "options": [
+                "To allow higher generation without additional GNA",
+                "To limit generation for water conservation",
+                "To prioritize renewable energy sources over hydro",
+                "To schedule emergency power outages"
+            ],
+            "correctAnswer": 0,
+            "explanation": "According to regulation 45(10)(b), hydro generating stations may generate above their declared capacity during high inflow periods without additional GNA."
+        },
+        {
+            "question": "Which entity is responsible for handling settlement disputes related to ancillary services?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "Settlement Nodal Agency"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to regulation 44(6), the Settlement Nodal Agency is responsible for handling scheduling, dispatch, and settlement disputes for ancillary services."
+        },
+        {
+            "question": "What is the purpose of publishing regional entity generating station details quarterly?",
+            "options": [
+                "To provide transparency and planning insights",
+                "To regulate power tariffs",
+                "To prevent over-reliance on thermal power",
+                "To allocate grid congestion charges"
+            ],
+            "correctAnswer": 0,
+            "explanation": "According to regulation 45(1)(a), RLDCs must publish details of generating stations quarterly to ensure transparency and assist in planning."
+        }
+    ];
+    
+        
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const quizSection = document.getElementById('quiz-section');
+        const questionContainer = document.getElementById('question-container');
+        const resultsSection = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const timeTakenElement = document.getElementById('time-taken');
+        
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        
+        // Variables
+        let userAnswers = [];
+        let timer;
+        let seconds = 0;
+        
+        // Event listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuiz);
+        retakeBtn.addEventListener('click', retakeQuiz);
+        
+        // Functions
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+        
+        function renderQuestions() {
+            questionContainer.innerHTML = '';
+            
+            quizData.forEach((questionData, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${questionData.question}</div>
+                    <div class="options">
+                        ${questionData.options.map((option, optionIndex) => `
+                            <div class="option">
+                                <input type="radio" id="q${index}-option${optionIndex}" name="question${index}" value="${optionIndex}">
+                                <label for="q${index}-option${optionIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionContainer.appendChild(questionDiv);
+            });
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', updateProgressBar);
+            });
+        }
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerElement.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateProgressBar() {
+            const totalQuestions = quizData.length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function submitQuiz() {
+            clearInterval(timer);
+            
+            // Collect user answers
+            userAnswers = [];
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                userAnswers.push(selectedOption ? parseInt(selectedOption.value) : -1);
+            }
+            
+            // Check if all questions are answered
+            const unansweredQuestions = userAnswers.filter(answer => answer === -1).length;
+            if (unansweredQuestions > 0) {
+                if (confirm(`You have ${unansweredQuestions} unanswered question(s). Are you sure you want to submit?`)) {
+                    showResults();
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display score
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreDisplay.innerHTML = `Your Score: ${score} out of ${quizData.length} (${percentage}%)`;
+            
+            // Display time taken
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timeTakenElement.textContent = `Time taken: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // Display answers and explanations
+            answersContainer.innerHTML = '';
+            quizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.correctAnswer;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.classList.add('answer-explanation');
+                
+                answerDiv.innerHTML = `
+                    <div><strong>Question ${index + 1}:</strong> ${questionData.question}</div>
+                    <div class="correct-answer">Correct Answer: ${String.fromCharCode(65 + questionData.correctAnswer)}. ${questionData.options[questionData.correctAnswer]}</div>
+                    <div class="${isCorrect ? 'user-answer-correct' : 'user-answer-incorrect'}">
+                        Your Answer: ${userAnswer === -1 ? 'Not answered' : String.fromCharCode(65 + userAnswer) + '. ' + questionData.options[userAnswer]}
+                    </div>
+                    <div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            // Hide quiz section and show results
+            quizSection.classList.add('hidden');
+            resultsSection.style.display = 'block';
+        }
+        
+        function retakeQuiz() {
+            // Reset variables
+            userAnswers = [];
+            seconds = 0;
+            
+            // Hide results and show quiz
+            resultsSection.style.display = 'none';
+            quizSection.classList.remove('hidden');
+            
+            // Re-render questions
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+    </script>
+</body>
+</html>

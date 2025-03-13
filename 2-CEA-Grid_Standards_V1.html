@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Regulations Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            width: 90%;
+            vertical-align: top;
+        }
+        
+        input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .answer-explanation {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .user-answer-correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .user-answer-incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .option label {
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CEA Grid Standards Quiz</h1>
+    
+    <div id="intro" class="quiz-container">
+        <h2>Welcome to the Quiz</h2>
+        <p>Select one answer for each question. After completing all questions, you will see your score and the correct answers with explanations.</p>
+        <div class="button-container">
+            <button id="start-btn">Start Quiz</button>
+        </div>
+    </div>
+    
+    <div id="quiz-section" class="hidden">
+        <div id="timer">Time: 00:00</div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="quiz-container" id="question-container">
+            <!-- Questions will be added here dynamically -->
+        </div>
+        
+        <div class="button-container">
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div class="quiz-container">
+            <h2>Quiz Results</h2>
+            <div id="score-display" class="score-display"></div>
+            <div id="time-taken"></div>
+            <div id="answers-container">
+                <!-- Answer explanations will be added here dynamically -->
+            </div>
+            <div class="button-container">
+                <button id="retake-btn">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const quizData = [
+        {
+            "question": "What is the permissible frequency range for grid operation under normal conditions?",
+            "options": [
+                "48.5 - 50.5 Hz",
+                "49.0 - 50.5 Hz",
+                "49.2 - 50.3 Hz",
+                "49.5 - 50.5 Hz"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 3(1)(a), all entities must make efforts to operate at a frequency close to 50 Hz and shall not allow it to go beyond the range 49.2 to 50.3 Hz, except during transient periods following tripping."
+        },
+        {
+            "question": "What is the maximum voltage unbalance permitted for 220 kV systems?",
+            "options": [
+                "1.5%",
+                "2.0%",
+                "2.5%",
+                "3.0%"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to Table 3 in regulation 3(1)(d), the maximum permissible value of voltage unbalance for 220 kV system is 2%."
+        },
+        {
+            "question": "What is the maximum fault clearance time specified for 400 kV systems?",
+            "options": [
+                "80 milliseconds",
+                "100 milliseconds",
+                "160 milliseconds",
+                "200 milliseconds"
+            ],
+            "correctAnswer": 1,
+            "explanation": "As per Table 4 in regulation 3(1)(e), the maximum fault clearance time for 765 kV and 400 kV systems is 100 milliseconds."
+        },
+        {
+            "question": "What is the maximum permissible Total Harmonic Distortion (THD) for 400 kV systems?",
+            "options": [
+                "1.5%",
+                "2.0%",
+                "2.5%",
+                "5.0%"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to Table 5 in regulation 3(2), the maximum permissible Total Harmonic Distortion for 400 kV systems is 2.0%."
+        },
+        {
+            "question": "What is the permissible limit of voltage fluctuation for step changes that may occur repetitively?",
+            "options": [
+                "1.0%",
+                "1.5%",
+                "2.0%",
+                "3.0%"
+            ],
+            "correctAnswer": 1,
+            "explanation": "As per regulation 3(1)(h)(i), the permissible limit of voltage fluctuation for step changes which may occur repetitively is 1.5%."
+        },
+        {
+            "question": "What is the permissible limit for occasional voltage fluctuations other than step changes?",
+            "options": [
+                "1.5%",
+                "2.0%",
+                "3.0%",
+                "5.0%"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 3(1)(h)(ii), for occasional fluctuations other than step changes, the maximum permissible limit is 3%."
+        },
+        {
+            "question": "Which of the following defines a 'grid incident' Category GI-2?",
+            "options": [
+                "Tripping of power system elements at 220 kV requiring generation rescheduling",
+                "Tripping of power system elements at 400 kV and above requiring generation rescheduling",
+                "Loss of less than 10% of antecedent generation in a regional grid",
+                "Loss of 10-20% of antecedent generation in a regional grid"
+            ],
+            "correctAnswer": 1,
+            "explanation": "As per regulation 11(1), Category GI-2 refers to tripping of power system elements requiring rescheduling of generation or load, without total loss of supply at a substation or loss of integrity of the grid at 400 kV and above (220 kV and above in North-Eastern Region)."
+        },
+        {
+            "question": "What is the minimum retention period for operational data records including equipment and system parameters?",
+            "options": [
+                "6 months",
+                "1 year",
+                "2 years",
+                "3 years"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to regulation 16(1), operational data including equipment and system parameters logged manually and electronically shall be preserved for at least three years."
+        },
+        {
+            "question": "How frequently should Thermo-vision scanning for hot spots be carried out on overhead lines and substation equipment at voltage levels of 220 kV and above?",
+            "options": [
+                "Once a month",
+                "Once every six months",
+                "At least once a year",
+                "Once every two years"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 26, the Thermo-vision scanning for hot spots on all overhead lines and sub-station equipment at voltage level of 220 kV and above shall be carried out at least once a year."
+        },
+        {
+            "question": "What action must be taken if a fault is not cleared by a circuit breaker within the specified time limit?",
+            "options": [
+                "Manual intervention must be initiated",
+                "Backup protection must isolate the fault in 100 milliseconds",
+                "Breaker fail protection shall initiate tripping of all other breakers in the concerned bus-section",
+                "System must enter islanding mode"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to the proviso to regulation 3(1)(e), in the event of non-clearance of the fault by a circuit breaker within the time limit specified, the breaker fail protection shall initiate tripping of all other breakers in the concerned bus-section to clear the fault in the next 200 milliseconds."
+        },
+        {
+            "question": "Which entity is responsible for preparing Islanding schemes for separation of systems?",
+            "options": [
+                "Central Electricity Authority",
+                "State Load Despatch Centres",
+                "Regional Power Committees",
+                "Transmission licensees"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 10(1), the Regional Power Committees shall prepare Islanding schemes for separation of systems with a view to save healthy system from total collapse in case of grid disturbance."
+        },
+        {
+            "question": "What is the purpose of an 'Emergency Restoration System' as defined in the regulations?",
+            "options": [
+                "To restore power supply to critical loads during emergency",
+                "To facilitate quick restoration of damaged transmission line towers",
+                "To provide backup power during grid failures",
+                "To analyze causes of grid disturbances"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to the definition in regulation 2(1)(g), 'Emergency Restoration System' means a system to facilitate quick restoration of damaged or failed transmission line towers or sections."
+        },
+        {
+            "question": "Which Category of grid disturbance represents the loss of 25% of antecedent generation in a regional grid?",
+            "options": [
+                "Category GD-1",
+                "Category GD-2",
+                "Category GD-3",
+                "Category GD-4"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 11(2), Category GD-3 represents when twenty per cent to less than thirty per cent of the antecedent generation or load in a regional grid is lost."
+        },
+        {
+            "question": "What is the maximum voltage allowed for a 400 kV system under normal operation?",
+            "options": [
+                "380 kV",
+                "400 kV",
+                "410 kV",
+                "420 kV"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to Table 1 in regulation 3(1)(b), the maximum steady state voltage limit for a 400 kV system is 420 kV."
+        },
+        {
+            "question": "How often should grid operators undergo training in real time digital simulator?",
+            "options": [
+                "At least once in a year",
+                "At least once in two years",
+                "At least once in three years",
+                "At least once in five years"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 33(3), every grid operator shall undergo training in real time digital simulator and a refresher course at least once in two years."
+        },
+        {
+            "question": "What is the minimum duration for which a record of operational instructions given by Load Despatch Centres must be kept?",
+            "options": [
+                "3 months",
+                "6 months",
+                "1 year",
+                "3 years"
+            ],
+            "correctAnswer": 1,
+            "explanation": "As per regulation 8(2), the record of instructions given by Load Despatch Centres shall be kept for at least six months."
+        },
+        {
+            "question": "What is the requirement for the maintenance of transmission lines in polluted or coastal areas?",
+            "options": [
+                "Once a year only",
+                "Twice a year - before winter and before summer",
+                "Once every six months",
+                "Only when defects are observed"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 24(3), the maintenance of lines passing through polluted or coastal areas should be completed once before onset of winter and once before onset of summer."
+        },
+        {
+            "question": "When should residual life assessment be carried out for major equipment?",
+            "options": [
+                "Once in five years",
+                "As envisaged by relevant BIS standards or manufacturer's instructions",
+                "Only after equipment failure",
+                "At the end of design life"
+            ],
+            "correctAnswer": 1,
+            "explanation": "As per regulation 30, residual life assessment shall be carried out for all major equipment as envisaged by the relevant standards specified by the Bureau of Indian Standards, manufacturer's instruction or industry best practices."
+        },
+        {
+            "question": "What is 'condition based maintenance' as defined in the regulations?",
+            "options": [
+                "Maintenance based on the age of the equipment",
+                "Maintenance based on a fixed time schedule",
+                "Maintenance based on continuous assessment of equipment condition",
+                "Maintenance carried out during emergencies"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 2(1)(e), 'condition based maintenance' means a set of maintenance actions based on continuous or frequent assessment of equipment condition."
+        },
+        {
+            "question": "What is the individual harmonic distortion limit for any particular frequency in a 765 kV system?",
+            "options": [
+                "0.5%",
+                "1.0%",
+                "1.5%",
+                "2.0%"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to Table 5 in regulation 3(2), the individual harmonic distortion limit for any particular frequency in a 765 kV system is 1.0%."
+        },
+        {
+            "question": "Which of the following contingencies must the grid system be capable of withstanding without experiencing loss of stability?",
+            "options": [
+                "Outage of a 765 kV Double circuit line",
+                "Outage of a 400 kV Double circuit line",
+                "Outage of both poles of HVDC Bipolar line",
+                "Outage of a 765 kV Single circuit line without series compensation"
+            ],
+            "correctAnswer": 3,
+            "explanation": "According to regulation 3(1)(f)(6), the system must be capable of withstanding the outage of a 765 kV Single circuit line without series compensation without experiencing loss of stability."
+        },
+        {
+            "question": "What is the deadline for reporting a grid disturbance to the Authority by the Regional Load Despatch Centre?",
+            "options": [
+                "Immediately",
+                "Within 12 hours",
+                "Within 24 hours",
+                "Within 48 hours"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 13(2), the grid disturbance resulting in failure of power supply to large areas in a State shall be reported by the Regional Load Despatch Centre to the Authority within twenty-four hours of occurrence."
+        },
+        {
+            "question": "How frequently should maintenance staff undergo training?",
+            "options": [
+                "Once at induction only",
+                "At induction and at least once in a year",
+                "At induction and at least once in two years",
+                "At induction and at least once in five years"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 33(1), every person involved in operation and maintenance of transmission lines shall be trained at the induction level and at least once in a year."
+        },
+        {
+            "question": "What is the minimum voltage level at which an entity's electrical plant must be connected to the grid to be covered under these regulations?",
+            "options": [
+                "11 kV",
+                "22 kV",
+                "33 kV",
+                "66 kV"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 2(1)(h), 'Entity' means any organization whose electrical plant is connected to the Grid at voltage level 33 kV and above."
+        },
+        {
+            "question": "What is the deadline for entities to submit a detailed report of operation of under-frequency relays?",
+            "options": [
+                "Monthly basis",
+                "Weekly basis",
+                "Daily basis",
+                "Quarterly basis"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 9(2), all constituents shall submit a detailed report of operation of under-frequency relays at different frequencies to Regional Load Despatch Centre and Regional Power Committee on daily basis."
+        },
+        {
+            "question": "How often should mock exercises in fire fighting be carried out at substations?",
+            "options": [
+                "Once a month",
+                "Once in six months",
+                "At least once in a year",
+                "Once in two years"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 18(3), mock exercises in fire fighting shall be carried out at least once in a year and record maintained."
+        },
+        {
+            "question": "Who is responsible for coordinating the annual maintenance plan for Inter-Regional transmission system?",
+            "options": [
+                "Central Electricity Authority",
+                "Regional Load Despatch Centres",
+                "Regional Power Committees",
+                "State Load Despatch Centres"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 5(2), the Regional Power Committees shall co-ordinate the annual maintenance plan for Inter-Regional transmission system."
+        },
+        {
+            "question": "What is the minimum voltage of the system for which grid disturbance is defined in the Northern, Eastern, Western and Southern regions?",
+            "options": [
+                "132 kV",
+                "220 kV",
+                "400 kV",
+                "765 kV"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 2(1)(i), 'grid disturbance' is defined at the level of transmission system at 220 kV and above (132 kV and above in the case of North-Eastern Region)."
+        },
+        {
+            "question": "Under which circumstance can an Entity introduce or take out an element of the grid without the concurrence of the Appropriate Load Despatch Centre?",
+            "options": [
+                "During scheduled maintenance",
+                "During testing of equipment",
+                "In case of imminent risk of safety of plant and personnel",
+                "During low load conditions"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per regulation 6(1), no Entity shall introduce or take out the element of the grid without the concurrence of the Appropriate Load Despatch Centre except in case of imminent risk of safety of plant and personnel."
+        },
+        {
+            "question": "For which voltage level of transmission lines is an Emergency Restoration System required?",
+            "options": [
+                "220 kV and above",
+                "220 kV strategic lines and 400 kV and above",
+                "400 kV and above only",
+                "765 kV only"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to regulation 22, each transmission licensee shall have an arrangement for restoration of transmission lines of 400 kV and above and strategic 220 kV lines through the use of Emergency Restoration System."
+        }
+    ];
+    
+        
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const quizSection = document.getElementById('quiz-section');
+        const questionContainer = document.getElementById('question-container');
+        const resultsSection = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const timeTakenElement = document.getElementById('time-taken');
+        
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        
+        // Variables
+        let userAnswers = [];
+        let timer;
+        let seconds = 0;
+        
+        // Event listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuiz);
+        retakeBtn.addEventListener('click', retakeQuiz);
+        
+        // Functions
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+        
+        function renderQuestions() {
+            questionContainer.innerHTML = '';
+            
+            quizData.forEach((questionData, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${questionData.question}</div>
+                    <div class="options">
+                        ${questionData.options.map((option, optionIndex) => `
+                            <div class="option">
+                                <input type="radio" id="q${index}-option${optionIndex}" name="question${index}" value="${optionIndex}">
+                                <label for="q${index}-option${optionIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionContainer.appendChild(questionDiv);
+            });
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', updateProgressBar);
+            });
+        }
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerElement.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateProgressBar() {
+            const totalQuestions = quizData.length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function submitQuiz() {
+            clearInterval(timer);
+            
+            // Collect user answers
+            userAnswers = [];
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                userAnswers.push(selectedOption ? parseInt(selectedOption.value) : -1);
+            }
+            
+            // Check if all questions are answered
+            const unansweredQuestions = userAnswers.filter(answer => answer === -1).length;
+            if (unansweredQuestions > 0) {
+                if (confirm(`You have ${unansweredQuestions} unanswered question(s). Are you sure you want to submit?`)) {
+                    showResults();
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display score
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreDisplay.innerHTML = `Your Score: ${score} out of ${quizData.length} (${percentage}%)`;
+            
+            // Display time taken
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timeTakenElement.textContent = `Time taken: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // Display answers and explanations
+            answersContainer.innerHTML = '';
+            quizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.correctAnswer;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.classList.add('answer-explanation');
+                
+                answerDiv.innerHTML = `
+                    <div><strong>Question ${index + 1}:</strong> ${questionData.question}</div>
+                    <div class="correct-answer">Correct Answer: ${String.fromCharCode(65 + questionData.correctAnswer)}. ${questionData.options[questionData.correctAnswer]}</div>
+                    <div class="${isCorrect ? 'user-answer-correct' : 'user-answer-incorrect'}">
+                        Your Answer: ${userAnswer === -1 ? 'Not answered' : String.fromCharCode(65 + userAnswer) + '. ' + questionData.options[userAnswer]}
+                    </div>
+                    <div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            // Hide quiz section and show results
+            quizSection.classList.add('hidden');
+            resultsSection.style.display = 'block';
+        }
+        
+        function retakeQuiz() {
+            // Reset variables
+            userAnswers = [];
+            seconds = 0;
+            
+            // Hide results and show quiz
+            resultsSection.style.display = 'none';
+            quizSection.classList.remove('hidden');
+            
+            // Re-render questions
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+    </script>
+</body>
+</html>

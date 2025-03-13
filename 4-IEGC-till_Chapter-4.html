@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEGC till Chapter 4 Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            width: 90%;
+            vertical-align: top;
+        }
+        
+        input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .answer-explanation {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .user-answer-correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .user-answer-incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .option label {
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>IEGC Till Chapter 4 Quiz</h1>
+    
+    <div id="intro" class="quiz-container">
+        <h2>Welcome to the Quiz</h2>
+        <p>Select one answer for each question. After completing all questions, you will see your score and the correct answers with explanations.</p>
+        <div class="button-container">
+            <button id="start-btn">Start Quiz</button>
+        </div>
+    </div>
+    
+    <div id="quiz-section" class="hidden">
+        <div id="timer">Time: 00:00</div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="quiz-container" id="question-container">
+            <!-- Questions will be added here dynamically -->
+        </div>
+        
+        <div class="button-container">
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div class="quiz-container">
+            <h2>Quiz Results</h2>
+            <div id="score-display" class="score-display"></div>
+            <div id="time-taken"></div>
+            <div id="answers-container">
+                <!-- Answer explanations will be added here dynamically -->
+            </div>
+            <div class="button-container">
+                <button id="retake-btn">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const quizData = [
+        {
+            "question": "What is the primary function of the Central Electricity Regulatory Commission (CERC) under Section 79 of the Electricity Act, 2003?",
+            "options": [
+                "To regulate the generation, transmission, and distribution of electricity at the state level",
+                "To specify the Grid Code and enforce standards for quality, continuity, and reliability of electricity services",
+                "To manage the financial aspects of electricity tariffs for private power producers",
+                "To directly oversee the operation of all power stations in India"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Under Section 79 of the Electricity Act, 2003, CERC is responsible for specifying the Grid Code and enforcing quality, continuity, and reliability standards in electricity services."
+        },
+        {
+            "question": "Which entity is responsible for real-time operations for grid control and dispatch of electricity within a region?",
+            "options": [
+                "National Load Despatch Centre (NLDC)",
+                "State Load Despatch Centre (SLDC)",
+                "Regional Load Despatch Centre (RLDC)",
+                "Central Transmission Utility (CTU)"
+            ],
+            "correctAnswer": 2,
+            "explanation": "RLDC is responsible for real-time grid control and dispatch of electricity within its region as per the Grid Standards and the Grid Code."
+        },
+        {
+            "question": "What is the purpose of the Protection Code mentioned in Chapter 4?",
+            "options": [
+                "To define the criteria for integrating renewable energy sources into the grid",
+                "To ensure proper coordination of protection systems for isolating faulty equipment and preventing unintended operations",
+                "To specify financial penalties for non-compliance with grid regulations",
+                "To establish tariffs for ancillary services used in grid operations"
+            ],
+            "correctAnswer": 1,
+            "explanation": "The Protection Code ensures reliability, selectivity, and coordination of protection systems to isolate faulty equipment and prevent unintended operations."
+        },
+        {
+            "question": "What is 'Ancillary Services' in the context of power system operation?",
+            "options": [
+                "Services necessary to support the grid operation by maintaining power quality, reliability, and security",
+                "Backup power supply provided by private generators during outages",
+                "Financial services provided to power utilities for infrastructure development",
+                "A system of penalties for overloading transmission lines"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Ancillary Services refer to support services essential for grid stability, including primary reserve, secondary reserve, and black start services."
+        },
+        {
+            "question": "Which of the following does NOT fall under the functions of the National Load Despatch Centre (NLDC)?",
+            "options": [
+                "Monitoring and ensuring optimal scheduling and dispatch of electricity",
+                "Providing real-time operational data to generating stations",
+                "Managing regional transmission congestion independently",
+                "Carrying out simulation studies for national-level generation resource adequacy planning"
+            ],
+            "correctAnswer": 2,
+            "explanation": "NLDC does not manage regional congestion independently; this is primarily the responsibility of RLDCs."
+        },
+        {
+            "question": "What is the role of the State Load Despatch Centre (SLDC) in grid operations?",
+            "options": [
+                "Managing the scheduling and dispatch of electricity at the national level",
+                "Overseeing the economic and efficient operation of power plants",
+                "Ensuring compliance with directions from RLDC for grid stability",
+                "Regulating the tariffs for electricity distribution companies"
+            ],
+            "correctAnswer": 2,
+            "explanation": "SLDCs are responsible for ensuring compliance with RLDC directions for maintaining grid stability and secure operations within the state."
+        },
+        {
+            "question": "What is meant by 'Black Start Procedure' in the context of grid management?",
+            "options": [
+                "Restarting the power grid after a partial or total blackout",
+                "Reducing grid load during peak demand periods",
+                "Automatic voltage regulation during outages",
+                "Disconnecting non-essential loads to stabilize the grid"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Black Start Procedure refers to restarting the grid after a blackout using designated black start-capable power plants."
+        },
+        {
+            "question": "According to the Grid Code, which factor is essential for demand forecasting?",
+            "options": [
+                "Historical data and econometric modeling",
+                "Public perception of electricity pricing",
+                "Weather reports without statistical analysis",
+                "Financial reserves of the distribution companies"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Demand forecasting is based on historical data, econometric models, and trend analysis for accurate electricity demand estimation."
+        },
+        {
+            "question": "What does the term 'Grid Security' refer to?",
+            "options": [
+                "The physical security of power plants and substations",
+                "The ability of the power system to maintain stable operations and return to normal after disturbances",
+                "A financial guarantee provided by transmission companies",
+                "The exclusive rights of certain power companies over transmission networks"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Grid Security ensures the power system remains stable and can return to normal after experiencing disturbances."
+        },
+        {
+            "question": "What is the function of the 'Regional Power Committee' (RPC)?",
+            "options": [
+                "Approving tariff rates for power generation companies",
+                "Maintaining the financial accounts of electricity distribution companies",
+                "Ensuring coordinated operation and planning of the regional grid",
+                "Monitoring consumer complaints regarding power supply"
+            ],
+            "correctAnswer": 2,
+            "explanation": "RPCs coordinate the operation, planning, and stability of the regional grid among various stakeholders."
+        },
+        {
+            "question": "What is the role of the Central Transmission Utility (CTU)?",
+            "options": [
+                "Regulating electricity tariffs at the state level",
+                "Ensuring inter-state transmission system planning and development",
+                "Monitoring consumer electricity consumption",
+                "Approving grid connection requests from private users"
+            ],
+            "correctAnswer": 1,
+            "explanation": "CTU is responsible for the planning and development of the inter-state transmission system, ensuring its reliability and adequacy."
+        },
+        {
+            "question": "Which entity is responsible for specifying the Grid Standards for operation and maintenance?",
+            "options": [
+                "Regional Load Despatch Centre (RLDC)",
+                "Central Electricity Authority (CEA)",
+                "Central Electricity Regulatory Commission (CERC)",
+                "State Electricity Regulatory Commissions (SERCs)"
+            ],
+            "correctAnswer": 1,
+            "explanation": "The CEA is mandated under the Electricity Act, 2003 to specify Grid Standards for operation and maintenance."
+        },
+        {
+            "question": "What is 'Available Transfer Capability' (ATC)?",
+            "options": [
+                "The total installed capacity of a power station",
+                "The portion of Total Transfer Capability (TTC) that can be used for transmission after considering reliability margins",
+                "The maximum load that a transmission line can handle under normal conditions",
+                "The total electricity demand of all consumers in a region"
+            ],
+            "correctAnswer": 1,
+            "explanation": "ATC is the power transfer capability available after deducting the Transmission Reliability Margin (TRM) from the Total Transfer Capability (TTC)."
+        },
+        {
+            "question": "What does the term 'Demand Response' refer to?",
+            "options": [
+                "A mechanism for adjusting electricity generation in response to system frequency changes",
+                "Consumer-side adjustments in electricity consumption in response to grid conditions",
+                "Automatic shutdown of generating stations during low demand periods",
+                "The forecasting of future electricity demand based on historical trends"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Demand Response involves variations in electricity consumption by consumers in response to grid requirements, helping maintain stability."
+        },
+        {
+            "question": "Which of the following best defines 'Frequency Stability'?",
+            "options": [
+                "The ability of the power system to maintain steady voltage levels at all nodes",
+                "The ability of the system to return to normal frequency after a disturbance",
+                "The ability of consumers to maintain steady electricity consumption",
+                "The measure of variation in electricity prices over time"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Frequency Stability refers to the power system's ability to maintain and restore its frequency following a disturbance."
+        },
+        {
+            "question": "What is the purpose of 'Security Constrained Economic Dispatch' (SCED)?",
+            "options": [
+                "To optimize the dispatch of generating units while ensuring system security",
+                "To reduce electricity tariffs for industrial consumers",
+                "To control the frequency of the grid by adjusting demand",
+                "To impose financial penalties on transmission companies"
+            ],
+            "correctAnswer": 0,
+            "explanation": "SCED aims to optimize power generation while considering system constraints to ensure secure grid operation."
+        },
+        {
+            "question": "Which of the following is considered a Renewable Energy Generating Station (REGS)?",
+            "options": [
+                "A nuclear power plant",
+                "A coal-based thermal power plant",
+                "A solar or wind power plant with or without an Energy Storage System",
+                "A diesel-based power plant"
+            ],
+            "correctAnswer": 2,
+            "explanation": "REGS refers to generating stations based on renewable sources like solar or wind, with or without storage systems."
+        },
+        {
+            "question": "What is the primary purpose of 'Protection Coordination' in power systems?",
+            "options": [
+                "To ensure all generators run at maximum efficiency",
+                "To protect system elements and isolate faulty sections quickly",
+                "To enhance power quality by filtering out harmonics",
+                "To reduce the cost of electricity transmission"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Protection coordination ensures quick isolation of faults while avoiding unnecessary trips, thereby improving system stability."
+        },
+        {
+            "question": "What is 'Governor Droop' in power systems?",
+            "options": [
+                "A mechanism that automatically adjusts power generation based on system frequency",
+                "The reduction in efficiency of a generator over time",
+                "The difference between actual and scheduled power generation",
+                "A condition where the voltage of a generator decreases due to excessive load"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Governor Droop allows generators to respond automatically to frequency changes by adjusting power output."
+        },
+        {
+            "question": "Which entity is responsible for ensuring compliance with the Protection Protocol in a region?",
+            "options": [
+                "Regional Load Despatch Centre (RLDC)",
+                "State Electricity Boards",
+                "Regional Power Committee (RPC)",
+                "Central Transmission Utility (CTU)"
+            ],
+            "correctAnswer": 2,
+            "explanation": "The RPC develops and enforces protection protocols to ensure coordinated and effective fault isolation."
+        },
+        {
+            "question": "What does 'Inertia' refer to in the context of grid stability?",
+            "options": [
+                "The resistance of the grid to changes in frequency due to rotating mass in generators",
+                "The speed at which a generator can be turned on and off",
+                "The ability of renewable energy sources to supply power continuously",
+                "The delay in restoring power after a blackout"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Inertia helps resist frequency changes by providing stored kinetic energy from rotating generators."
+        },
+        {
+            "question": "What is a 'Blackout State'?",
+            "options": [
+                "A state where electricity tariffs are fixed at zero",
+                "A condition where a region experiences total loss of power",
+                "A system state where electricity generation exceeds demand",
+                "A planned shutdown of a power station for maintenance"
+            ],
+            "correctAnswer": 1,
+            "explanation": "A blackout state refers to a condition where an entire region loses power due to grid failure."
+        },
+        {
+            "question": "What is 'Flat Frequency Control'?",
+            "options": [
+                "A method of stabilizing voltage across transmission lines",
+                "A control method that adjusts generation based only on frequency deviations",
+                "A system that keeps electricity demand constant throughout the day",
+                "A pricing mechanism for consumers based on frequency variations"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Flat Frequency Control corrects Area Control Error (ACE) by considering only frequency deviations."
+        },
+        {
+            "question": "What is 'Trial Operation' in a power system?",
+            "options": [
+                "A phase where a newly commissioned power plant undergoes test runs",
+                "A period when electricity tariffs are experimentally reduced",
+                "A temporary adjustment in generation schedules for maintenance",
+                "A test period for consumers to switch electricity suppliers"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Trial Operation refers to test runs of a new power plant before it is declared commercially operational."
+        },
+        {
+            "question": "What does 'Net Injection Schedule' represent?",
+            "options": [
+                "The sum of all power generation from a station before transmission losses",
+                "The total power demand of a state at peak hours",
+                "The algebraic sum of all transactions scheduled through the inter-state transmission system",
+                "The additional power injected into the grid due to deviations from scheduled demand"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Net Injection Schedule represents the total scheduled transactions through the inter-state transmission system."
+        },
+        {
+            "question": "What is the function of the 'Regional Energy Account' (REA)?",
+            "options": [
+                "It records the financial transactions of electricity consumers",
+                "It maintains the energy and parameter records for billing and settlement of ISGS and other users in a region",
+                "It monitors the energy consumption of large industrial users",
+                "It is used to track the efficiency of power plants"
+            ],
+            "correctAnswer": 1,
+            "explanation": "The REA is issued by the respective Regional Power Committee (RPC) and is used for billing and settlement of Inter-State Generating Stations (ISGS) and other regional energy users."
+        },
+        {
+            "question": "What does 'Ramp Rate' indicate in a power system?",
+            "options": [
+                "The speed at which a generating unit can increase or decrease its output",
+                "The frequency variation allowed in a transmission system",
+                "The rate at which electricity demand grows annually",
+                "The rate at which voltage fluctuations occur in a system"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Ramp Rate is the rate of change of a generating unit’s output, typically expressed in MW per minute."
+        },
+        {
+            "question": "Which of the following entities is responsible for assessing and planning the inter-state transmission system?",
+            "options": [
+                "State Transmission Utility (STU)",
+                "Regional Load Despatch Centre (RLDC)",
+                "Central Transmission Utility (CTU)",
+                "Electricity Regulatory Commissions"
+            ],
+            "correctAnswer": 2,
+            "explanation": "The CTU is responsible for planning the inter-state transmission system to ensure adequate power transfer capability."
+        },
+        {
+            "question": "What is the purpose of 'Time Synchronization' in a power system?",
+            "options": [
+                "To maintain a consistent electricity supply across different regions",
+                "To align disturbance recorders and event loggers for accurate fault analysis",
+                "To ensure all generating units operate at the same speed",
+                "To synchronize tariff changes across power exchanges"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Time synchronization ensures accurate fault analysis by aligning disturbance recorders and event loggers with precise timestamps."
+        },
+        {
+            "question": "What is the significance of 'Flow-Gate' in a power system?",
+            "options": [
+                "A point where multiple transmission lines converge for power distribution",
+                "A transmission corridor that could cause cascading failures if overloaded",
+                "A control mechanism for managing reactive power in substations",
+                "A special tariff mechanism for high-voltage consumers"
+            ],
+            "correctAnswer": 1,
+            "explanation": "A Flow-Gate is a group of transmission lines whose outage could lead to system instability or cascading failures."
+        }
+
+    ];
+    
+        
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const quizSection = document.getElementById('quiz-section');
+        const questionContainer = document.getElementById('question-container');
+        const resultsSection = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const timeTakenElement = document.getElementById('time-taken');
+        
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        
+        // Variables
+        let userAnswers = [];
+        let timer;
+        let seconds = 0;
+        
+        // Event listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuiz);
+        retakeBtn.addEventListener('click', retakeQuiz);
+        
+        // Functions
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+        
+        function renderQuestions() {
+            questionContainer.innerHTML = '';
+            
+            quizData.forEach((questionData, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${questionData.question}</div>
+                    <div class="options">
+                        ${questionData.options.map((option, optionIndex) => `
+                            <div class="option">
+                                <input type="radio" id="q${index}-option${optionIndex}" name="question${index}" value="${optionIndex}">
+                                <label for="q${index}-option${optionIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionContainer.appendChild(questionDiv);
+            });
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', updateProgressBar);
+            });
+        }
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerElement.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateProgressBar() {
+            const totalQuestions = quizData.length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function submitQuiz() {
+            clearInterval(timer);
+            
+            // Collect user answers
+            userAnswers = [];
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                userAnswers.push(selectedOption ? parseInt(selectedOption.value) : -1);
+            }
+            
+            // Check if all questions are answered
+            const unansweredQuestions = userAnswers.filter(answer => answer === -1).length;
+            if (unansweredQuestions > 0) {
+                if (confirm(`You have ${unansweredQuestions} unanswered question(s). Are you sure you want to submit?`)) {
+                    showResults();
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display score
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreDisplay.innerHTML = `Your Score: ${score} out of ${quizData.length} (${percentage}%)`;
+            
+            // Display time taken
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timeTakenElement.textContent = `Time taken: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // Display answers and explanations
+            answersContainer.innerHTML = '';
+            quizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.correctAnswer;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.classList.add('answer-explanation');
+                
+                answerDiv.innerHTML = `
+                    <div><strong>Question ${index + 1}:</strong> ${questionData.question}</div>
+                    <div class="correct-answer">Correct Answer: ${String.fromCharCode(65 + questionData.correctAnswer)}. ${questionData.options[questionData.correctAnswer]}</div>
+                    <div class="${isCorrect ? 'user-answer-correct' : 'user-answer-incorrect'}">
+                        Your Answer: ${userAnswer === -1 ? 'Not answered' : String.fromCharCode(65 + userAnswer) + '. ' + questionData.options[userAnswer]}
+                    </div>
+                    <div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            // Hide quiz section and show results
+            quizSection.classList.add('hidden');
+            resultsSection.style.display = 'block';
+        }
+        
+        function retakeQuiz() {
+            // Reset variables
+            userAnswers = [];
+            seconds = 0;
+            
+            // Hide results and show quiz
+            resultsSection.style.display = 'none';
+            quizSection.classList.remove('hidden');
+            
+            // Re-render questions
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+    </script>
+</body>
+</html>

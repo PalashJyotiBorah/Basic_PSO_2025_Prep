@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEA Technical Standards for Connectivity to the Grid Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            width: 90%;
+            vertical-align: top;
+        }
+        
+        input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .answer-explanation {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .user-answer-correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .user-answer-incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .option label {
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CEA Technical Standards for Connectivity to the Grid Quiz</h1>
+    
+    <div id="intro" class="quiz-container">
+        <h2>Welcome to the Quiz</h2>
+        <p>Select one answer for each question. After completing all questions, you will see your score and the correct answers with explanations.</p>
+        <div class="button-container">
+            <button id="start-btn">Start Quiz</button>
+        </div>
+    </div>
+    
+    <div id="quiz-section" class="hidden">
+        <div id="timer">Time: 00:00</div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="quiz-container" id="question-container">
+            <!-- Questions will be added here dynamically -->
+        </div>
+        
+        <div class="button-container">
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div class="quiz-container">
+            <h2>Quiz Results</h2>
+            <div id="score-display" class="score-display"></div>
+            <div id="time-taken"></div>
+            <div id="answers-container">
+                <!-- Answer explanations will be added here dynamically -->
+            </div>
+            <div class="button-container">
+                <button id="retake-btn">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const quizData = [
+        {
+            "question": "What is the new definition of 'installed capacity' for wind generating stations and generating stations using inverters?",
+            "options": [
+                "The summation of the name plate capacities of all the units of the generating station",
+                "Maximum Continuous Rating of the generating station",
+                "The summation of the name plate capacities of wind turbines or solar generating units",
+                "The summation of the rated capacities of all the units at minimum continuous rating"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to regulation 2(16A)(ii), in case of wind generating stations and generating stations using inverters, 'installed capacity' means the summation of the name plate capacities of wind turbines or solar generating units, as the case may be."
+        },
+        {
+            "question": "Which of the following entities is now included in the definition of 'requester' according to the amendment?",
+            "options": [
+                "Central Transmission Utility",
+                "Energy storage system",
+                "State Transmission Utility",
+                "Small consumer seeking connection below 33 kV"
+            ],
+            "correctAnswer": 1,
+            "explanation": "As per the amended clause 25, 'requester' now includes energy storage system along with generating company, captive generating plant, transmission licensee (other than CTU and STU), distribution licensee, solar park developer, wind park developer, wind-solar photo voltaic hybrid system, or bulk consumer seeking connection at voltage level 33 kV and above."
+        },
+        {
+            "question": "What is the minimum voltage level required for an entity to be classified as a 'user' under the amended regulations?",
+            "options": [
+                "11 kV and above",
+                "22 kV and above",
+                "33 kV and above",
+                "66 kV and above"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to the amended clause 34, a 'user' includes entities whose electrical plant is connected to the Grid at voltage level 33 kV and above."
+        },
+        {
+            "question": "Which new regulation mandates registration and obtaining a Unique Registration Number from the Authority?",
+            "options": [
+                "Regulation 9",
+                "Regulation 10",
+                "Regulation 11",
+                "Regulation 12"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Regulation 11 states that the user or requester shall get its generating unit or station registered and get an online generated Unique Registration Number from the Authority, as specified."
+        },
+        {
+            "question": "What is the operating frequency range for generating units as specified in the amendment?",
+            "options": [
+                "47.5 to 51.5 Hz",
+                "47.5 to 52 Hz",
+                "48.5 to 51.5 Hz",
+                "49.5 to 50.5 Hz"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to clause B2(2), the generating unit shall be capable of operating in the frequency range 47.5 to 52 Hz and be able to deliver rated output in the frequency range of 49.5 Hz to 50.5 Hz."
+        },
+        {
+            "question": "What is the minimum Short Circuit Ratio required at the interconnection point where a generating resource is proposed to be connected?",
+            "options": [
+                "3",
+                "4",
+                "5",
+                "6"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to clause B2(8), Short Circuit Ratio at the interconnection point where the generating resource is proposed to be connected shall not be less than 5."
+        },
+        {
+            "question": "What is the required droop setting for governors or frequency controllers of generating units with capacity more than 10 MW?",
+            "options": [
+                "1 to 3%",
+                "2 to 5%",
+                "3 to 6%",
+                "4 to 8%"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to clause B2(4)(ii), generating stations with installed capacity of more than 10 MW shall have governors or frequency controllers of the units at a droop of 3 to 6%."
+        },
+        {
+            "question": "What is the maximum permitted dead band for frequency controllers in generating units?",
+            "options": [
+                "±0.01 Hz",
+                "±0.02 Hz",
+                "±0.03 Hz",
+                "±0.05 Hz"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to clause B2(4)(ii), the dead band for frequency controllers must not exceed ±0.03 Hz."
+        },
+        {
+            "question": "What is the minimum real power primary frequency response required for frequency deviations in excess of 0.3 Hz?",
+            "options": [
+                "5% of maximum AC active power capacity",
+                "10% of maximum AC active power capacity",
+                "15% of maximum AC active power capacity",
+                "20% of maximum AC active power capacity"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to the proviso under clause B2(4)(ii), for frequency deviations in excess of 0.3 Hz, the Generating Station shall have the facility to provide an immediate (within 1 second) real power primary frequency response of at least 10% of the maximum Alternating Current active power capacity."
+        },
+        {
+            "question": "What is the maximum allowable rate of change of power output for generating stations?",
+            "options": [
+                "± 5% per minute",
+                "± 10% per minute",
+                "± 15% per minute",
+                "± 20% per minute"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to clause B2(4)(iv), generating stations shall be equipped with the facility for controlling the rate of change of power output at a rate not more than ± 10% per minute."
+        },
+        {
+            "question": "Above what aggregate capacity must generating stations have provision to receive signals from the Load Dispatch Centre for varying active and reactive power output?",
+            "options": [
+                "100 MW and above",
+                "250 MW and above",
+                "500 MW and above",
+                "1000 MW and above"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to clause B2(5), the generating stations of aggregate capacity of 500 MW and above shall have the provision to receive the signal from the State Load Dispatch Centre or Regional Load Dispatch Centre for varying active and reactive power output."
+        },
+        {
+            "question": "What is the minimum time a generating station must remain connected to the grid when voltage rises to between 1.20 and 1.30 pu?",
+            "options": [
+                "0 seconds (instantaneous trip)",
+                "0.2 seconds",
+                "2 seconds",
+                "Continuous"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to clause B2(7), when voltage rises to between 1.20 and 1.30 pu, the minimum time to remain connected is 0.2 seconds."
+        },
+        {
+            "question": "What is the acceptable power factor range for distribution system and bulk consumer as per the amended regulations?",
+            "options": [
+                "± 0.90",
+                "± 0.92",
+                "± 0.95",
+                "± 0.98"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to paragraph 2(ii) in Part-IV, the power factor for distribution system and bulk consumer shall be within ± 0.95."
+        },
+        {
+            "question": "Which standard is specified for limits of voltage harmonics and current harmonics in the amended regulations?",
+            "options": [
+                "IEEE 519-2012",
+                "IEEE 519-2014",
+                "IEC 61000-3-2",
+                "IEC 61000-4-30"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to paragraph 3(i) in Part-IV, the limits of voltage harmonics and current harmonics shall be in accordance with the IEEE 519-2014 standards, as amended from time to time."
+        },
+        {
+            "question": "What provision has been made for hydro-electric generating units where Techno-Economic Concurrence has been accorded by the Authority?",
+            "options": [
+                "They must operate at unity power factor",
+                "They must operate at 0.95 lagging power factor",
+                "They must operate at the rated output at the power factor as specified in the techno-economic concurrence",
+                "They must operate at power factor between 0.9 leading and 0.9 lagging"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to the proviso added in paragraph A1(5), hydro-electric generating units, where Techno-Economic Concurrence has been accorded by the Authority under section 8 of the Act, shall be capable of operating at the rated output at the power factor as specified in such techno-economic concurrence."
+        },
+        {
+            "question": "What type of meters should be used for measuring and metering of harmonics?",
+            "options": [
+                "Meters complying with provisions of IEC 61000-3-2",
+                "Meters complying with provisions of IEC 61000-4-7",
+                "Meters complying with provisions of IEC 61000-4-30 Class A",
+                "Meters complying with provisions of IEEE 1159"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to paragraph 3(ii) in Part-IV, measuring and metering of harmonics shall be a continuous process with meters complying with provisions of IEC 61000-4-30 Class A."
+        },
+        {
+            "question": "What is the timeline for existing bulk consumers to install power quality meters and share data with distribution licensees?",
+            "options": [
+                "6 months from the commencement of the amendment",
+                "12 months from the commencement of the amendment",
+                "24 months from the commencement of the amendment",
+                "36 months from the commencement of the amendment"
+            ],
+            "correctAnswer": 1,
+            "explanation": "According to the proviso under paragraph 3(iv) in Part-IV, existing bulk consumers shall comply with the provision to install power quality meters within twelve months from the date of commencement of the amended regulations."
+        },
+        {
+            "question": "What is the timeline for distribution licensees to install power quality meters at 33 kV substations?",
+            "options": [
+                "1 year covering all substations",
+                "2 years covering all substations",
+                "3 years covering at least 33% of substations each year",
+                "5 years covering at least 20% of substations each year"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to paragraph 3(vi) in Part-IV, distribution licensees shall install power quality meters in a phased manner within three years from the date of commencement of the amended regulations, covering at least 33% of the 33 kV substations each year."
+        },
+        {
+            "question": "What is the requirement for active power restoration after voltage dips?",
+            "options": [
+                "Active power must be restored to 80% of pre-fault level within 2 seconds",
+                "Active power must be restored to 85% of pre-fault level within 1.5 seconds",
+                "Active power must be restored to 90% of pre-fault level within 1 second",
+                "Active power must be restored to 95% of pre-fault level within 0.5 seconds"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to the proviso under clause B2(3), active power must be restored to at least 90% of the pre-fault level within 1 sec of restoration of voltage."
+        },
+        {
+            "question": "Which new definition has been added to include systems combining wind and solar resources?",
+            "options": [
+                "Hybrid power system",
+                "Wind-solar system",
+                "Wind-solar photo voltaic hybrid system",
+                "Renewable hybrid generator"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to clause (38) added after clause (35), 'wind-solar photo voltaic hybrid system' means a system of electricity generation, which has combination of wind and solar photo voltaic resources, with or without storage system."
+        }
+    ];
+    
+        
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const quizSection = document.getElementById('quiz-section');
+        const questionContainer = document.getElementById('question-container');
+        const resultsSection = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const timeTakenElement = document.getElementById('time-taken');
+        
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        
+        // Variables
+        let userAnswers = [];
+        let timer;
+        let seconds = 0;
+        
+        // Event listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuiz);
+        retakeBtn.addEventListener('click', retakeQuiz);
+        
+        // Functions
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+        
+        function renderQuestions() {
+            questionContainer.innerHTML = '';
+            
+            quizData.forEach((questionData, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${questionData.question}</div>
+                    <div class="options">
+                        ${questionData.options.map((option, optionIndex) => `
+                            <div class="option">
+                                <input type="radio" id="q${index}-option${optionIndex}" name="question${index}" value="${optionIndex}">
+                                <label for="q${index}-option${optionIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionContainer.appendChild(questionDiv);
+            });
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', updateProgressBar);
+            });
+        }
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerElement.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateProgressBar() {
+            const totalQuestions = quizData.length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function submitQuiz() {
+            clearInterval(timer);
+            
+            // Collect user answers
+            userAnswers = [];
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                userAnswers.push(selectedOption ? parseInt(selectedOption.value) : -1);
+            }
+            
+            // Check if all questions are answered
+            const unansweredQuestions = userAnswers.filter(answer => answer === -1).length;
+            if (unansweredQuestions > 0) {
+                if (confirm(`You have ${unansweredQuestions} unanswered question(s). Are you sure you want to submit?`)) {
+                    showResults();
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display score
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreDisplay.innerHTML = `Your Score: ${score} out of ${quizData.length} (${percentage}%)`;
+            
+            // Display time taken
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timeTakenElement.textContent = `Time taken: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // Display answers and explanations
+            answersContainer.innerHTML = '';
+            quizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.correctAnswer;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.classList.add('answer-explanation');
+                
+                answerDiv.innerHTML = `
+                    <div><strong>Question ${index + 1}:</strong> ${questionData.question}</div>
+                    <div class="correct-answer">Correct Answer: ${String.fromCharCode(65 + questionData.correctAnswer)}. ${questionData.options[questionData.correctAnswer]}</div>
+                    <div class="${isCorrect ? 'user-answer-correct' : 'user-answer-incorrect'}">
+                        Your Answer: ${userAnswer === -1 ? 'Not answered' : String.fromCharCode(65 + userAnswer) + '. ' + questionData.options[userAnswer]}
+                    </div>
+                    <div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            // Hide quiz section and show results
+            quizSection.classList.add('hidden');
+            resultsSection.style.display = 'block';
+        }
+        
+        function retakeQuiz() {
+            // Reset variables
+            userAnswers = [];
+            seconds = 0;
+            
+            // Hide results and show quiz
+            resultsSection.style.display = 'none';
+            quizSection.classList.remove('hidden');
+            
+            // Re-render questions
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEGC Chapter 6 Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            width: 90%;
+            vertical-align: top;
+        }
+        
+        input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .answer-explanation {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .user-answer-correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .user-answer-incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .option label {
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>IEGC Chapter 6 Quiz</h1>
+    
+    <div id="intro" class="quiz-container">
+        <h2>Welcome to the Quiz</h2>
+        <p>Select one answer for each question. After completing all questions, you will see your score and the correct answers with explanations.</p>
+        <div class="button-container">
+            <button id="start-btn">Start Quiz</button>
+        </div>
+    </div>
+    
+    <div id="quiz-section" class="hidden">
+        <div id="timer">Time: 00:00</div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="quiz-container" id="question-container">
+            <!-- Questions will be added here dynamically -->
+        </div>
+        
+        <div class="button-container">
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div class="quiz-container">
+            <h2>Quiz Results</h2>
+            <div id="score-display" class="score-display"></div>
+            <div id="time-taken"></div>
+            <div id="answers-container">
+                <!-- Answer explanations will be added here dynamically -->
+            </div>
+            <div class="button-container">
+                <button id="retake-btn">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const quizData = [
+        {
+            "question": "Which entity is responsible for monitoring the operation of the National Grid?",
+            "options": [
+                "SLDC",
+                "CTU",
+                "NLDC",
+                "RLDC"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (28)(2) states that the National Load Despatch Centre (NLDC) is responsible for monitoring the National Grid."
+        },
+        {
+            "question": "What is the primary objective of the Operating Code?",
+            "options": [
+                "To ensure integrity, stability, and resilience of the grid",
+                "To maximize revenue generation for utilities",
+                "To regulate power tariffs",
+                "To control fuel consumption in power plants"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (28)(1) states that all entities must function in coordination to ensure grid integrity, stability, and efficiency."
+        },
+        {
+            "question": "Which of the following entities must function round the clock to ensure grid stability?",
+            "options": [
+                "Only SLDCs",
+                "Only RLDCs and NLDC",
+                "Only generating stations",
+                "NLDC, RLDCs, SLDCs, and coordination centers of various entities"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (28)(6) mentions that NLDC, RLDCs, SLDCs, and generating stations must have qualified personnel round the clock."
+        },
+        {
+            "question": "Under what conditions can a grid element be taken out of service?",
+            "options": [
+                "During an emergency or to prevent damage",
+                "Only with prior written permission of the Commission",
+                "Only when it does not affect any other region",
+                "Anytime, based on the generator's discretion"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (29)(2) states that grid elements can only be taken out during emergencies, for safety, or under specific instructions."
+        },
+        {
+            "question": "Which of the following reserves is NOT used for frequency control?",
+            "options": [
+                "Primary Reserve",
+                "Tertiary Reserve",
+                "Voltage Control Reserve",
+                "Black Start Reserve"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (30)(4) lists frequency reserves as Primary, Secondary, and Tertiary. Black Start Reserve is for system restoration, not frequency control."
+        },
+        {
+            "question": "Which entity is responsible for developing detailed operating procedures for each regional grid?",
+            "options": [
+                "NLDC",
+                "RLDC",
+                "SLDC",
+                "CTU"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (28)(4) states that RLDCs develop detailed procedures for each regional grid in consultation with NLDC and regional entities."
+        },
+        {
+            "question": "Which voltage level must transmission substations be manned round the clock?",
+            "options": [
+                "400 kV and above",
+                "220 kV and above",
+                "132 kV and above",
+                "110 kV and above"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (28)(7) specifies that all generating stations and transmission substations of 110 kV and above must have qualified operating personnel."
+        },
+        {
+            "question": "Which entity is responsible for coordinating with RLDCs for system restoration?",
+            "options": [
+                "CTU",
+                "SLDC",
+                "State Governments",
+                "Generators"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (34)(1) mentions that SLDCs must coordinate with RLDCs for system restoration."
+        },
+        {
+            "question": "What is the minimum grid frequency required before under-frequency load shedding (UFLS) is triggered?",
+            "options": [
+                "49.90 Hz",
+                "49.40 Hz",
+                "49.20 Hz",
+                "48.80 Hz"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (29)(12) specifies that UFLS is triggered at 48.80 Hz."
+        },
+        {
+            "question": "What is the nominal frequency of the National Grid?",
+            "options": [
+                "49.000 Hz",
+                "50.000 Hz",
+                "51.000 Hz",
+                "48.500 Hz"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (30)(1) states that the National Reference Frequency is 50.000 Hz."
+        },
+        {
+            "question": "Which category of generating stations is exempted from mandatory primary response?",
+            "options": [
+                "Nuclear generating stations",
+                "Hydro generating stations with pondage up to 3 hours",
+                "Wind and solar generators",
+                "Both (1) and (2)"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (30)(10)(h) states that nuclear and certain hydro generators are exempt from mandatory primary response."
+        },
+        {
+            "question": "What is the minimum frequency response dead band allowed for generators?",
+            "options": [
+                "±0.01 Hz",
+                "±0.03 Hz",
+                "±0.05 Hz",
+                "±0.10 Hz"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (30)(10)(k) mentions that the inherent dead band of a generating unit shall not exceed ±0.03 Hz."
+        },
+        {
+            "question": "Which of the following reserves is used for voltage control?",
+            "options": [
+                "Primary Reserve",
+                "Secondary Reserve",
+                "Tertiary Reserve",
+                "Voltage Control Reserve"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (30)(4)(c) defines Voltage Control Reserve for controlling grid voltage."
+        },
+        {
+            "question": "Which entity is responsible for setting under-frequency relay (UFR) thresholds?",
+            "options": [
+                "CTU",
+                "RPCs",
+                "Generating Companies",
+                "State Governments"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (29)(12) states that RPCs define and manage UFR thresholds for grid safety."
+        },
+        {
+            "question": "Which report must RLDCs submit quarterly to RPCs?",
+            "options": [
+                "System Constraints Report",
+                "Daily Generation Report",
+                "Grid Restoration Report",
+                "Weather Forecast Report"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (37)(1)(c) states that RLDCs must submit a quarterly report highlighting system constraints."
+        },
+        {
+            "question": "Which frequency control reserve is deployed first in case of deviation from the nominal frequency?",
+            "options": [
+                "Secondary Reserve",
+                "Tertiary Reserve",
+                "Primary Reserve",
+                "Voltage Control Reserve"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (30)(4)(a) states that Primary Reserves are the first line of defense in frequency control, followed by Secondary and Tertiary Reserves."
+        },
+        {
+            "question": "Who is responsible for tuning Automatic Voltage Regulators (AVRs) and Power System Stabilizers (PSSs)?",
+            "options": [
+                "RLDCs",
+                "Generating Stations",
+                "CTU",
+                "State Governments"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (29)(7) mentions that tuning of AVRs, PSSs, and voltage controllers is the responsibility of the generating stations."
+        },    
+        {
+            "question": "What is the purpose of the Black Start Reserve?",
+            "options": [
+                "To stabilize grid frequency",
+                "To provide emergency reactive power",
+                "To restart the grid after a blackout",
+                "To manage peak load demand"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (30)(4)(b) defines Black Start Reserve as the capability to restore power in case of a grid blackout."
+        },
+        {
+            "question": "Which authority is responsible for real-time monitoring of inter-regional transmission?",
+            "options": [
+                "SLDC",
+                "CTU",
+                "NLDC",
+                "State Governments"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (28)(2) mentions that NLDC monitors inter-regional transmission and the national grid."
+        },
+        {
+            "question": "Which of the following load-shedding mechanisms must be installed by all distribution licensees?",
+            "options": [
+                "Demand Response System",
+                "Automatic Under-Frequency Relays (UFR)",
+                "Manual Load Curtailment",
+                "Peak Load Curtailment System"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (29)(12) states that distribution licensees must install UFRs to prevent grid failure."
+        },
+        {
+            "question": "How frequently should mock drills for islanding schemes be conducted?",
+            "options": [
+                "Monthly",
+                "Quarterly",
+                "Annually",
+                "Every five years"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (29)(11) states that islanding scheme mock drills should be conducted annually."
+        },
+        {
+            "question": "What is the primary role of System Protection Schemes (SPS)?",
+            "options": [
+                "To manage energy losses",
+                "To control power generation",
+                "To operate the transmission system within limits and prevent major disturbances",
+                "To determine electricity pricing"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (29)(14) explains that SPS is designed to prevent voltage collapse and cascading failures in the grid."
+        },
+        {
+            "question": "Which control mode is used for Secondary Reserve deployment?",
+            "options": [
+                "Flat Tie-Line Control",
+                "Flat Frequency Control",
+                "Tie-Line Bias Control",
+                "All of the above"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (30)(11)(g) mentions that secondary control can operate under all these modes depending on grid conditions."
+        },
+        {
+            "question": "How soon must the Secondary Reserve Ancillary Service (SRAS) respond to a dispatch signal?",
+            "options": [
+                "Within 10 seconds",
+                "Within 30 seconds",
+                "Within 1 minute",
+                "Within 5 minutes"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (30)(11)(j) specifies that SRAS must start responding within 30 seconds and reach full capacity within 15 minutes."
+        },
+        {
+            "question": "Which factor is NOT considered in estimating Secondary Reserve capacity?",
+            "options": [
+                "Largest unit size in the region",
+                "Load forecast error",
+                "Solar forecast error",
+                "Transmission tariff rates"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (30)(11)(k) states that secondary reserve capacity is based on generation size, forecast errors, and contingency planning, but not tariff rates."
+        },
+        {
+            "question": "Who is responsible for estimating and declaring the Frequency Bias Coefficient?",
+            "options": [
+                "SLDC for each state",
+                "RLDC for each region",
+                "NLDC for the national grid",
+                "All of the above"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (30)(11)(e) specifies that SLDC, RLDC, and NLDC estimate and declare Frequency Bias Coefficients for their respective control areas."
+        },
+        {
+            "question": "Which entity procures and deploys Tertiary Reserves?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "Distribution Licensees"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (30)(12) states that NLDC procures and deploys Tertiary Reserves for grid balancing."
+        },
+        {
+            "question": "What is the required response time for Tertiary Reserve Ancillary Service (TRAS)?",
+            "options": [
+                "Within 5 minutes",
+                "Within 15 minutes",
+                "Within 30 minutes",
+                "Within 60 minutes"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (30)(12)(j) states that TRAS must respond within 15 minutes and sustain for 60 minutes."
+        },
+        {
+            "question": "Which agency is responsible for estimating inter-state and inter-regional Available Transfer Capability (ATC)?",
+            "options": [
+                "SLDC",
+                "RLDC",
+                "NLDC",
+                "CEA"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (31)(5) states that NLDC is responsible for estimating and publishing inter-state and inter-regional ATC."
+        },
+        {
+            "question": "Which factor is considered when designing an Under-Frequency Load Shedding (UFLS) scheme?",
+            "options": [
+                "Real-time MW power flow",
+                "Circuit breaker status",
+                "Uniform spatial spread of feeders",
+                "All of the above"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (29)(13) states that real-time power flow, circuit breaker status, and uniform feeder spread are considered in UFLS design."
+        },
+        {
+            "question": "Who is responsible for preparing restoration procedures for each region?",
+            "options": [
+                "NLDC",
+                "RLDCs in consultation with stakeholders",
+                "SLDC",
+                "Generating stations"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (34)(2) states that RLDCs prepare detailed restoration procedures."
+        },
+        {
+            "question": "How long must operational planning study records be maintained?",
+            "options": [
+                "5 years",
+                "10 years",
+                "15 years",
+                "25 years"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (33)(7) states that operational planning study records must be maintained for at least 25 years."
+        },
+        {
+            "question": "What is the role of Voltage Control Ancillary Services (VCAS)?",
+            "options": [
+                "To control frequency deviations",
+                "To stabilize voltage levels by injecting or absorbing reactive power",
+                "To regulate generation dispatch",
+                "To prevent system blackouts"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (30)(4)(c) defines Voltage Control Ancillary Services as those that manage reactive power for voltage stability."
+        },
+        {
+            "question": "What is the allowable band of grid frequency in India?",
+            "options": [
+                "49.800 - 50.200 Hz",
+                "49.900 - 50.050 Hz",
+                "49.500 - 50.500 Hz",
+                "49.700 - 50.300 Hz"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (30)(1) states that the allowable band of frequency is 49.900 - 50.050 Hz."
+        },
+        {
+            "question": "Which agency is responsible for determining the primary reserve requirement for the national grid?",
+            "options": [
+                "CEA",
+                "SLDC",
+                "NLDC",
+                "CTU"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (30)(10)(c) states that NLDC determines the primary reserve requirement for the national grid."
+        },
+        {
+            "question": "Which of the following is a control area?",
+            "options": [
+                "State Control Area",
+                "Regional Control Area",
+                "National Control Area",
+                "All of the above"
+            ],
+            "correctAnswer": 3,
+            "explanation": "Clause (30)(9) defines control areas at state, regional, and national levels for grid management."
+        },
+        {
+            "question": "Who is responsible for submitting node-wise estimated demand data to RLDC?",
+            "options": [
+                "SLDC",
+                "CTU",
+                "NLDC",
+                "CEA"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (31)(2)(d) states that SLDCs must submit node-wise estimated demand data."
+        },
+        {
+            "question": "By when should SLDCs submit their yearly demand estimation?",
+            "options": [
+                "30th June",
+                "31st December",
+                "30th September",
+                "1st January"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (31)(2)(h) specifies that SLDCs must submit yearly demand estimation by 30th September of the previous year."
+        },
+        {
+            "question": "Which entity is responsible for preparing an annual outage plan?",
+            "options": [
+                "CTU",
+                "RPCs",
+                "SLDC",
+                "State Governments"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (32)(2) states that RPCs prepare the annual outage plan in consultation with stakeholders."
+        },
+        {
+            "question": "What is the primary purpose of an annual outage plan?",
+            "options": [
+                "To increase power generation",
+                "To minimize overall downtime and maintain grid security",
+                "To schedule tariff revisions",
+                "To improve renewable energy integration"
+            ],
+            "correctAnswer": 1,
+            "explanation": "Clause (32)(2) states that the annual outage plan is designed to minimize downtime and maintain grid security."
+        },
+        {
+            "question": "Which generating station outages are planned to maximize renewable energy utilization?",
+            "options": [
+                "Wind during peak wind season",
+                "Solar during peak summer",
+                "Hydro during lean water season",
+                "Thermal in winter"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (32)(2)(c) mentions that hydro outages are planned during lean water seasons to maximize energy extraction."
+        },
+        {
+            "question": "What should be done before the planned outage of a grid element?",
+            "options": [
+                "Obtain clearance from SLDC/RLDC/NLDC",
+                "Submit an application to the State Government",
+                "Publish an announcement in newspapers",
+                "Notify consumers directly"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (32)(3) states that clearance must be obtained from the relevant LDC before planned outages."
+        },
+        {
+            "question": "What is the purpose of an islanding scheme?",
+            "options": [
+                "To create isolated power zones during disturbances",
+                "To increase power demand",
+                "To reduce electricity tariffs",
+                "To enhance transmission capacity"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (29)(10) defines islanding schemes as strategies to maintain power in specific regions during major grid failures."
+        },
+        {
+            "question": "What is the primary role of SLDCs in operational planning?",
+            "options": [
+                "Forecasting demand and ensuring adequacy of resources",
+                "Monitoring international power exchanges",
+                "Setting electricity tariffs",
+                "Managing fuel supply for power plants"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (31)(2) states that SLDCs are responsible for demand estimation and resource adequacy planning."
+        },
+        {
+            "question": "What is the penalty for non-compliance with tuning of Power System Stabilizers (PSS)?",
+            "options": [
+                "Fine by State Government",
+                "Temporary disconnection from the grid",
+                "Action under Section 29 of the Act",
+                "Reduction in power purchase agreements"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (29)(8) states that RLDC can approach the Commission under Section 29 for non-compliance with PSS tuning."
+        },
+        {
+            "question": "How frequently must protection and relay settings be coordinated in the grid?",
+            "options": [
+                "Every 3 months",
+                "Every 5 years",
+                "As per plan finalized by RPCs",
+                "Only when a failure occurs"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (29)(9) states that relay settings must be periodically coordinated as per the RPC’s finalized plan."
+        },
+        {
+            "question": "What is the purpose of an inertia requirement in the power system?",
+            "options": [
+                "To maintain grid frequency stability",
+                "To increase reactive power support",
+                "To reduce power losses",
+                "To improve economic efficiency"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (30)(9) states that the power system must have sufficient inertia to keep frequency stable during contingencies."
+        },
+        {
+            "question": "What is the purpose of the Restoration Procedure?",
+            "options": [
+                "To restore the grid after a blackout",
+                "To schedule maintenance of power plants",
+                "To increase transmission line efficiency",
+                "To manage demand response"
+            ],
+            "correctAnswer": 0,
+            "explanation": "Clause (34)(1) states that the Restoration Procedure is designed to recover the grid from partial or total blackouts."
+        },
+        {
+            "question": "Which of the following reports must be maintained for at least 25 years?",
+            "options": [
+                "Weather reports",
+                "Energy price reports",
+                "Operational analysis reports",
+                "Market trading reports"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (37)(1)(c) states that operational analysis reports must be stored for at least 25 years."
+        },
+        {
+            "question": "What is the purpose of Voltage Control Ancillary Services (VCAS)?",
+            "options": [
+                "To control active power",
+                "To provide frequency stability",
+                "To manage reactive power for voltage stability",
+                "To balance market demand"
+            ],
+            "correctAnswer": 2,
+            "explanation": "Clause (30)(4)(c) defines VCAS as a service for managing reactive power and voltage levels."
+        }
+
+    ];
+    
+        
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const quizSection = document.getElementById('quiz-section');
+        const questionContainer = document.getElementById('question-container');
+        const resultsSection = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const timeTakenElement = document.getElementById('time-taken');
+        
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        
+        // Variables
+        let userAnswers = [];
+        let timer;
+        let seconds = 0;
+        
+        // Event listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuiz);
+        retakeBtn.addEventListener('click', retakeQuiz);
+        
+        // Functions
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+        
+        function renderQuestions() {
+            questionContainer.innerHTML = '';
+            
+            quizData.forEach((questionData, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${questionData.question}</div>
+                    <div class="options">
+                        ${questionData.options.map((option, optionIndex) => `
+                            <div class="option">
+                                <input type="radio" id="q${index}-option${optionIndex}" name="question${index}" value="${optionIndex}">
+                                <label for="q${index}-option${optionIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionContainer.appendChild(questionDiv);
+            });
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', updateProgressBar);
+            });
+        }
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerElement.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateProgressBar() {
+            const totalQuestions = quizData.length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function submitQuiz() {
+            clearInterval(timer);
+            
+            // Collect user answers
+            userAnswers = [];
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                userAnswers.push(selectedOption ? parseInt(selectedOption.value) : -1);
+            }
+            
+            // Check if all questions are answered
+            const unansweredQuestions = userAnswers.filter(answer => answer === -1).length;
+            if (unansweredQuestions > 0) {
+                if (confirm(`You have ${unansweredQuestions} unanswered question(s). Are you sure you want to submit?`)) {
+                    showResults();
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display score
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreDisplay.innerHTML = `Your Score: ${score} out of ${quizData.length} (${percentage}%)`;
+            
+            // Display time taken
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timeTakenElement.textContent = `Time taken: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // Display answers and explanations
+            answersContainer.innerHTML = '';
+            quizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.correctAnswer;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.classList.add('answer-explanation');
+                
+                answerDiv.innerHTML = `
+                    <div><strong>Question ${index + 1}:</strong> ${questionData.question}</div>
+                    <div class="correct-answer">Correct Answer: ${String.fromCharCode(65 + questionData.correctAnswer)}. ${questionData.options[questionData.correctAnswer]}</div>
+                    <div class="${isCorrect ? 'user-answer-correct' : 'user-answer-incorrect'}">
+                        Your Answer: ${userAnswer === -1 ? 'Not answered' : String.fromCharCode(65 + userAnswer) + '. ' + questionData.options[userAnswer]}
+                    </div>
+                    <div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            // Hide quiz section and show results
+            quizSection.classList.add('hidden');
+            resultsSection.style.display = 'block';
+        }
+        
+        function retakeQuiz() {
+            // Reset variables
+            userAnswers = [];
+            seconds = 0;
+            
+            // Hide results and show quiz
+            resultsSection.style.display = 'none';
+            quizSection.classList.remove('hidden');
+            
+            // Re-render questions
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+    </script>
+</body>
+</html>

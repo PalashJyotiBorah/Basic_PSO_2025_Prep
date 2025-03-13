@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEGC till Chapter 4 Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            width: 90%;
+            vertical-align: top;
+        }
+        
+        input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .answer-explanation {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .user-answer-correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .user-answer-incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .option label {
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>IEGC Chapter 5 Quiz</h1>
+    
+    <div id="intro" class="quiz-container">
+        <h2>Welcome to the Quiz</h2>
+        <p>Select one answer for each question. After completing all questions, you will see your score and the correct answers with explanations.</p>
+        <div class="button-container">
+            <button id="start-btn">Start Quiz</button>
+        </div>
+    </div>
+    
+    <div id="quiz-section" class="hidden">
+        <div id="timer">Time: 00:00</div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="quiz-container" id="question-container">
+            <!-- Questions will be added here dynamically -->
+        </div>
+        
+        <div class="button-container">
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div class="quiz-container">
+            <h2>Quiz Results</h2>
+            <div id="score-display" class="score-display"></div>
+            <div id="time-taken"></div>
+            <div id="answers-container">
+                <!-- Answer explanations will be added here dynamically -->
+            </div>
+            <div class="button-container">
+                <button id="retake-btn">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const quizData = [
+        {
+            "question": "What is the maximum period allowed for the drawal of start-up power after the date of first synchronization?",
+            "options": [
+                "6 months",
+                "9 months",
+                "12 months",
+                "15 months"
+            ],
+            "correctAnswer": 2,
+            "explanation": "According to the regulations, the drawal of start-up power shall not exceed one year after the date of first synchronization."
+        },
+        {
+            "question": "What is the minimum period a thermal generating unit must operate at Maximum Continuous Rating (MCR) during a trial run?",
+            "options": [
+                "24 hours",
+                "48 hours",
+                "72 hours",
+                "96 hours"
+            ],
+            "correctAnswer": 2,
+            "explanation": "As per the regulations, a thermal generating unit must operate continuously at MCR for 72 hours during the trial run."
+        },
+        {
+            "question": "Which entity grants permission for interchanging power with the grid during commissioning?",
+            "options": [
+                "Central Electricity Regulatory Commission",
+                "Regional Load Despatch Centre",
+                "State Transmission Utility",
+                "Power Grid Corporation of India"
+            ],
+            "correctAnswer": 1,
+            "explanation": "The concerned RLDC grants permission for interchanging power with the grid during commissioning."
+        },
+        {
+            "question": "What is the minimum continuous operation requirement at MCR for a hydro generating unit?",
+            "options": [
+                "6 hours",
+                "12 hours",
+                "24 hours",
+                "36 hours"
+            ],
+            "correctAnswer": 1,
+            "explanation": "As per the regulations, a hydro generating unit must be in continuous operation at MCR for 12 hours during a trial run."
+        },
+        {
+            "question": "What is the minimum capacity required for a solar inverter unit trial run?",
+            "options": [
+                "10 MW",
+                "25 MW",
+                "50 MW",
+                "100 MW"
+            ],
+            "correctAnswer": 2,
+            "explanation": "The regulations state that a trial run for solar inverter unit(s) must be performed for a minimum capacity aggregating to 50 MW."
+        },
+        {
+            "question": "Which of the following is NOT a requirement for the declaration of COD of a thermal generating station?",
+            "options": [
+                "Demonstration of primary response",
+                "Successful trial run at MCR",
+                "Approval from the Central Electricity Regulatory Commission",
+                "Submission of test reports and documents"
+            ],
+            "correctAnswer": 2,
+            "explanation": "While demonstration of primary response, successful trial runs, and submission of test reports are required, there is no specific requirement for prior approval from the Central Electricity Regulatory Commission."
+        },
+        {
+            "question": "What is the penalty for using start-up power for construction activities?",
+            "options": [
+                "A warning from RLDC",
+                "Immediate stoppage of start-up power drawal",
+                "A fine of ₹10 lakhs",
+                "Cancellation of generating station’s connectivity"
+            ],
+            "correctAnswer": 1,
+            "explanation": "If it is established that the start-up power has been used for construction activity, the RLDC shall stop the drawal of start-up power."
+        },
+        {
+            "question": "What is the required duration for a successful trial run of a wind turbine generating unit?",
+            "options": [
+                "2 hours",
+                "4 hours",
+                "6 hours",
+                "8 hours"
+            ],
+            "correctAnswer": 1,
+            "explanation": "For a wind turbine(s), successful trial run means the flow of power and communication signal for not less than continuous 4 hours during periods of wind availability."
+        },
+        {
+            "question": "How many MW should be demonstrated in a solar inverter trial run for projects over 50 MW?",
+            "options": [
+                "5 MW in batches",
+                "10 MW in batches",
+                "50 MW in one go",
+                "100 MW in one go"
+            ],
+            "correctAnswer": 0,
+            "explanation": "For projects over 50 MW, the trial run can be performed in batches of 5 MW each."
+        },
+        {
+            "question": "Who must be notified at least 7 days in advance before a trial run of a generating unit?",
+            "options": [
+                "Central Transmission Utility",
+                "Regional Load Despatch Centre and beneficiaries",
+                "State Load Despatch Centre",
+                "Ministry of Power"
+            ],
+            "correctAnswer": 1,
+            "explanation": "The generating company must give at least 7 days' notice to the RLDC and identified beneficiaries before a trial run."
+        },
+        {
+            "question": "What is the minimum duration for a transmission system trial run?",
+            "options": [
+                "6 hours",
+                "12 hours",
+                "24 hours",
+                "48 hours"
+            ],
+            "correctAnswer": 2,
+            "explanation": "A transmission system or element must undergo a successful 24-hour trial run."
+        },
+        {
+            "question": "What is required for a transmission licensee to declare the COD of a transmission system?",
+            "options": [
+                "Approval from the Ministry of Power",
+                "Certificate signed by CMD/CEO/MD",
+                "Approval from all state transmission utilities",
+                "Verification from power purchase agreements"
+            ],
+            "correctAnswer": 1,
+            "explanation": "The transmission licensee must submit a certificate signed by an authorized signatory before declaring COD."
+        },
+        {
+            "question": "What document must a generating station submit before trial run?",
+            "options": [
+                "Load flow study report",
+                "Design head and water release data",
+                "Environmental clearance certificate",
+                "OEM certificate for turbine efficiency"
+            ],
+            "correctAnswer": 1,
+            "explanation": "The generating entity must provide details such as design head, water release, and operating parameters before a trial run."
+        },
+        {
+            "question": "What must a solar generating station demonstrate during a trial run?",
+            "options": [
+                "Voltage stability",
+                "Power flow and communication signal for 4 hours",
+                "Black start capability",
+                "Reactive power capability"
+            ],
+            "correctAnswer": 1,
+            "explanation": "A solar station must demonstrate power flow and communication signal for at least 4 hours during the trial run."
+        },
+        {
+            "question": "How is COD defined for an inter-state transmission system?",
+            "options": [
+                "After the transmission line is energized",
+                "After successful 24-hour power flow",
+                "When the generating station is ready",
+                "Upon tariff approval from the regulator"
+            ],
+            "correctAnswer": 1,
+            "explanation": "COD for a transmission system is declared after a successful 24-hour trial run."
+        },
+        {
+            "question": "How long must a pumped storage plant operate in both generation and pumping mode for a trial run?",
+            "options": [
+                "6 hours",
+                "12 hours",
+                "24 hours",
+                "48 hours"
+            ],
+            "correctAnswer": 2,
+            "explanation": "A pumped storage plant must successfully complete one full cycle in both generation and pumping mode for a trial run."
+        },
+        {
+            "question": "What happens if a solar plant cannot demonstrate its rated capacity due to insufficient sunlight?",
+            "options": [
+                "It cannot declare COD",
+                "It can declare COD but must demonstrate later",
+                "It must wait for one year",
+                "It must be de-rated immediately"
+            ],
+            "correctAnswer": 1,
+            "explanation": "COD can be declared, but the rated capacity must be demonstrated within one year when sufficient solar irradiation is available."
+        },
+        {
+            "question": "What is the requirement for trial run of an energy storage system (ESS)?",
+            "options": [
+                "Continuous operation for 24 hours",
+                "One full charge and discharge cycle",
+                "Black start capability test",
+                "Demonstration of ramping capability"
+            ],
+            "correctAnswer": 1,
+            "explanation": "A successful trial run for an ESS requires at least one full charge and discharge cycle."
+        }
+
+    ];
+    
+        
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const quizSection = document.getElementById('quiz-section');
+        const questionContainer = document.getElementById('question-container');
+        const resultsSection = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const timeTakenElement = document.getElementById('time-taken');
+        
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        
+        // Variables
+        let userAnswers = [];
+        let timer;
+        let seconds = 0;
+        
+        // Event listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuiz);
+        retakeBtn.addEventListener('click', retakeQuiz);
+        
+        // Functions
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+        
+        function renderQuestions() {
+            questionContainer.innerHTML = '';
+            
+            quizData.forEach((questionData, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${questionData.question}</div>
+                    <div class="options">
+                        ${questionData.options.map((option, optionIndex) => `
+                            <div class="option">
+                                <input type="radio" id="q${index}-option${optionIndex}" name="question${index}" value="${optionIndex}">
+                                <label for="q${index}-option${optionIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionContainer.appendChild(questionDiv);
+            });
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', updateProgressBar);
+            });
+        }
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerElement.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateProgressBar() {
+            const totalQuestions = quizData.length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function submitQuiz() {
+            clearInterval(timer);
+            
+            // Collect user answers
+            userAnswers = [];
+            for (let i = 0; i < quizData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                userAnswers.push(selectedOption ? parseInt(selectedOption.value) : -1);
+            }
+            
+            // Check if all questions are answered
+            const unansweredQuestions = userAnswers.filter(answer => answer === -1).length;
+            if (unansweredQuestions > 0) {
+                if (confirm(`You have ${unansweredQuestions} unanswered question(s). Are you sure you want to submit?`)) {
+                    showResults();
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizData[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display score
+            const percentage = Math.round((score / quizData.length) * 100);
+            scoreDisplay.innerHTML = `Your Score: ${score} out of ${quizData.length} (${percentage}%)`;
+            
+            // Display time taken
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timeTakenElement.textContent = `Time taken: ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // Display answers and explanations
+            answersContainer.innerHTML = '';
+            quizData.forEach((questionData, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === questionData.correctAnswer;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.classList.add('answer-explanation');
+                
+                answerDiv.innerHTML = `
+                    <div><strong>Question ${index + 1}:</strong> ${questionData.question}</div>
+                    <div class="correct-answer">Correct Answer: ${String.fromCharCode(65 + questionData.correctAnswer)}. ${questionData.options[questionData.correctAnswer]}</div>
+                    <div class="${isCorrect ? 'user-answer-correct' : 'user-answer-incorrect'}">
+                        Your Answer: ${userAnswer === -1 ? 'Not answered' : String.fromCharCode(65 + userAnswer) + '. ' + questionData.options[userAnswer]}
+                    </div>
+                    <div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            // Hide quiz section and show results
+            quizSection.classList.add('hidden');
+            resultsSection.style.display = 'block';
+        }
+        
+        function retakeQuiz() {
+            // Reset variables
+            userAnswers = [];
+            seconds = 0;
+            
+            // Hide results and show quiz
+            resultsSection.style.display = 'none';
+            quizSection.classList.remove('hidden');
+            
+            // Re-render questions
+            renderQuestions();
+            startTimer();
+            updateProgressBar();
+        }
+    </script>
+</body>
+</html>
