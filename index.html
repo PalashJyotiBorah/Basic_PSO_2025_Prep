@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select a Quiz</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f4f4f9;
+            background: linear-gradient(-45deg, #74ebd5, #ACB6E5, #FFD3A5, #E0C3FC);
+            background-size: 400% 400%;
+            animation: gradientBG 8s ease infinite;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -16,19 +20,32 @@
             margin: 0;
         }
 
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
             background: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             text-align: center;
             width: 90%;
             max-width: 400px;
         }
 
+        .logo {
+            width: 150px;
+            margin-bottom: 15px;
+        }
+
         h1 {
             color: #333;
             margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         select {
@@ -66,6 +83,7 @@
 </head>
 <body>
     <div class="container">
+        <img src="https://ancillary.grid-india.in/assets/img/GridIndiaLogo.png" alt="Company Logo" class="logo">
         <h1>PSO Basic Level Exams 2025 Preparation Quiz</h1>
         <select id="quizList">
             <option value="">-- Select a Quiz from Dropdown --</option>
