@@ -34,6 +34,7 @@
             text-align: center;
             width: 90%;
             max-width: 400px;
+            position: relative;
         }
 
         .logo {
@@ -79,6 +80,14 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #555;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 350px;
+        }
     </style>
 </head>
 <body>
@@ -89,6 +98,9 @@
             <option value="">-- Select a Quiz from Dropdown --</option>
         </select>
         <button onclick="startQuiz()">Start Quiz</button>
+        <p class="disclaimer">
+            These quizzes, created by NERLDC using AI, are meant for practice. While we strive for accuracy, please use your judgment when answering.
+        </p>
     </div>
 
     <script>
