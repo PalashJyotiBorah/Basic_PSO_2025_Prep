@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to PSO 2025 Exams Preparation Quiz</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        select, button { padding: 10px; font-size: 16px; margin-top: 10px; }
-    </style>
+    <title>PSO 2025 Exam Prep</title>
 </head>
 <body>
     <h1>Welcome to PSO 2025 Exams Preparation Quiz</h1>
@@ -15,26 +11,32 @@
     <select id="quizList">
         <option value="">-- Select a Quiz --</option>
     </select>
-    
+
     <button onclick="startQuiz()">Start Quiz</button>
 
     <script>
         async function loadQuizzes() {
             try {
-                const response = await fetch('quizzes.json?v=' + new Date().getTime()); // Cache-busting
-                if (!response.ok) throw new Error("Failed to load quizzes.json");
-                
+                console.log("Fetching quizzes...");
+
+                // Fetch quizzes.json (adding timestamp to prevent caching issues)
+                const response = await fetch('quizzes.json?v=' + new Date().getTime());
+                console.log("Response status:", response.status);
+
+                if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
+
                 const quizzes = await response.json();
-                console.log("Loaded quizzes:", quizzes); // Debugging log
-                
-                const select = document.getElementById("quizList");
-                select.innerHTML = '<option value="">-- Select a Quiz --</option>'; // Reset dropdown
-                
+                console.log("Loaded quizzes:", quizzes);
+
+                const selectElement = document.getElementById('quizList');
+                selectElement.innerHTML = '<option value="">-- Select a Quiz --</option>'; // Reset options
+
+                // Populate dropdown
                 quizzes.forEach(quiz => {
-                    let option = document.createElement("option");
+                    let option = document.createElement('option');
                     option.value = quiz.file;
                     option.textContent = quiz.name;
-                    select.appendChild(option);
+                    selectElement.appendChild(option);
                 });
 
             } catch (error) {
@@ -44,15 +46,20 @@
         }
 
         function startQuiz() {
-            const selectedQuiz = document.getElementById("quizList").value;
-            if (selectedQuiz) {
-                window.location.href = selectedQuiz; // Redirect to the quiz page
-            } else {
-                alert("Please select a quiz!");
+            const selectElement = document.getElementById('quizList');
+            const selectedQuiz = selectElement.value;
+
+            if (!selectedQuiz) {
+                alert("Please select a quiz first!");
+                return;
             }
+
+            // Open the selected quiz
+            window.location.href = selectedQuiz;
         }
 
-        loadQuizzes();
+        // Load quizzes on page load
+        document.addEventListener('DOMContentLoaded', loadQuizzes);
     </script>
 </body>
 </html>
