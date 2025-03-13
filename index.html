@@ -6,34 +6,47 @@
     <title>Welcome to PSO 2025 Exams Preparation Quiz</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        select, button { padding: 10px; font-size: 16px; }
+        select, button { padding: 10px; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>Welcome to PSO 2025 Exams Preparation Quiz</h1>
+    
     <select id="quizList">
         <option value="">-- Select a Quiz --</option>
     </select>
+    
     <button onclick="startQuiz()">Start Quiz</button>
 
     <script>
         async function loadQuizzes() {
-            const response = await fetch('quizzes.json'); // Fetch quiz list
-            const quizzes = await response.json();
-            const select = document.getElementById("quizList");
+            try {
+                const response = await fetch('quizzes.json?v=' + new Date().getTime()); // Cache-busting
+                if (!response.ok) throw new Error("Failed to load quizzes.json");
+                
+                const quizzes = await response.json();
+                console.log("Loaded quizzes:", quizzes); // Debugging log
+                
+                const select = document.getElementById("quizList");
+                select.innerHTML = '<option value="">-- Select a Quiz --</option>'; // Reset dropdown
+                
+                quizzes.forEach(quiz => {
+                    let option = document.createElement("option");
+                    option.value = quiz.file;
+                    option.textContent = quiz.name;
+                    select.appendChild(option);
+                });
 
-            quizzes.forEach(quiz => {
-                let option = document.createElement("option");
-                option.value = quiz.file;
-                option.textContent = quiz.name;
-                select.appendChild(option);
-            });
+            } catch (error) {
+                console.error("Error loading quizzes:", error);
+                alert("Failed to load quizzes. Please check console.");
+            }
         }
 
         function startQuiz() {
             const selectedQuiz = document.getElementById("quizList").value;
             if (selectedQuiz) {
-                window.location.href = selectedQuiz; // Redirect to quiz page
+                window.location.href = selectedQuiz; // Redirect to the quiz page
             } else {
                 alert("Please select a quiz!");
             }
